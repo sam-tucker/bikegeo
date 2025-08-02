@@ -338,7 +338,7 @@
     </div>
 
     <script>
-        function findOptimalStemConfig(headTubeTopX, headTubeTopY, headAngle, targetBarX, targetBarY, scale) {
+        function findOptimalStemConfig(headTubeTopX, headTubeTopY, headAngle, saddleTipX, saddleTipY, saddleCenterY, targetDrop, targetTipToBar, scale) {
             // Standard component options
             const spacerOptions = [0, 10, 20, 30, 40]; // mm
             const stemLengthOptions = [80, 90, 100, 110]; // mm  
@@ -368,23 +368,36 @@
                         const actualBarX = stemBodyTopX + (stemLength * scale) * Math.cos(stemAngleRad);
                         const actualBarY = stemBodyTopY + (stemLength * scale) * Math.sin(stemAngleRad);
                         
-                        // Calculate error distance from target (convert back to mm)
-                        const errorX = (actualBarX - targetBarX) / scale;
-                        const errorY = (actualBarY - targetBarY) / scale;
-                        const error = Math.sqrt(errorX * errorX + errorY * errorY);
+                        // Calculate actual bike fit measurements achieved
+                        const actualDrop = (actualBarY - saddleCenterY) / scale; // Saddle to bar drop
+                        const actualTipToBar = Math.sqrt(
+                            Math.pow((actualBarX - saddleTipX) / scale, 2) + 
+                            Math.pow((actualBarY - saddleTipY) / scale, 2)
+                        ); // Tip to bar center distance
+                        
+                        // Calculate errors for bike fit measurements (prioritize drop)
+                        const dropError = Math.abs(actualDrop - targetDrop);
+                        const tipToBarError = Math.abs(actualTipToBar - targetTipToBar);
+                        
+                        // Weight drop error more heavily (3x) since it's more critical
+                        const totalError = (dropError * 3) + tipToBarError;
                         
                         allConfigs.push({
-                            spacers, stemLength, stemAngle, error,
+                            spacers, stemLength, stemAngle, 
+                            error: totalError,
                             actualX: actualBarX, actualY: actualBarY,
-                            errorX: Math.round(errorX * 10) / 10,
-                            errorY: Math.round(errorY * 10) / 10
+                            actualDrop: Math.round(actualDrop * 10) / 10,
+                            actualTipToBar: Math.round(actualTipToBar * 10) / 10,
+                            dropError: Math.round(dropError * 10) / 10,
+                            tipToBarError: Math.round(tipToBarError * 10) / 10
                         });
                     }
                 }
             }
             
-            // Return top 3 closest matches
-            return allConfigs.sort((a, b) => a.error - b.error).slice(0, 3);
+            // Store all configs for debugging, return top 5 best fits
+            window.allOptimizationConfigs = allConfigs.sort((a, b) => a.error - b.error);
+            return window.allOptimizationConfigs.slice(0, 5);
         }
 
         // Simplified frame geometry visualization
@@ -450,10 +463,34 @@
             // Target handlebar position from fit requirements
             const horizontalDistance = Math.sqrt((saddleTipToBarCenter * saddleTipToBarCenter) - (saddleToBarHeight * saddleToBarHeight));
             const targetBarX = saddleTipX + (horizontalDistance * scale);
-            const targetBarY = saddleTipY + (saddleToBarHeight * scale);
+            const targetBarY = saddleTipY + (saddleToBarHeight * scale); // DROP = handlebars BELOW saddle tip
             
-            // Find optimal stem configuration
-            const stemOptions = findOptimalStemConfig(headTubeTopX, headTubeTopY, headAngle, targetBarX, targetBarY, scale);
+            // Calculate saddle center position (for drop measurement)
+            const saddleCenterY = bbY - (saddleHeight * scale);
+            
+            // Find optimal stem configuration based on bike fit measurements
+            const stemOptions = findOptimalStemConfig(
+                headTubeTopX, headTubeTopY, headAngle, 
+                saddleTipX, saddleTipY, saddleCenterY,
+                saddleToBarHeight, saddleTipToBarCenter, 
+                scale
+            );
+            
+            // DEBUG: Show what the algorithm found
+            console.log('\n=== BIKE FIT OPTIMIZATION ===');
+            console.log('Target measurements:', { 
+                saddleDrop: saddleToBarHeight + 'mm', 
+                tipToBar: saddleTipToBarCenter + 'mm' 
+            });
+            console.log('\nTop 5 component options:');
+            
+            for (let i = 0; i < stemOptions.length; i++) {
+                const opt = stemOptions[i];
+                console.log(`${i+1}. ${opt.spacers}mm spacers + ${opt.stemLength}mm stem + ${opt.stemAngle}°`);
+                console.log(`   Achieves: ${opt.actualDrop}mm drop (target: ${saddleToBarHeight}mm), ${opt.actualTipToBar}mm tip-to-bar (target: ${saddleTipToBarCenter}mm)`);
+                console.log(`   Errors: Drop ${opt.dropError}mm, Tip-to-bar ${opt.tipToBarError}mm, Total score: ${Math.round(opt.error * 10) / 10}`);
+                console.log('');
+            }
             
             // Use best option
             const bestConfig = stemOptions[0];
@@ -467,13 +504,21 @@
                 stemLength: stemLength,
                 spacerHeight: spacerHeight,
                 stemAngle: stemAngle,
-                stemOptions: stemOptions
+                stemOptions: stemOptions,
+                actualDrop: bestConfig.actualDrop,
+                actualTipToBar: bestConfig.actualTipToBar,
+                dropError: bestConfig.dropError,
+                tipToBarError: bestConfig.tipToBarError
             });
 
             // Draw the bike frame with actual geometry and fit data
             drawBikeDiagram({
                 reach, stack, headAngle, seatAngle, headTube, seatTube, bbDrop,
-                saddleHeight, saddleLength, seatpostSetback, saddleTipToBB, saddleRailPosition, saddleToBarHeight, saddleTipToBarCenter, spacerHeight, stemLength, stemAngle
+                saddleHeight, saddleLength, seatpostSetback, saddleTipToBB, saddleRailPosition, saddleToBarHeight, saddleTipToBarCenter, spacerHeight, stemLength, stemAngle,
+                actualDrop: bestConfig.actualDrop,
+                actualTipToBar: bestConfig.actualTipToBar,
+                dropError: bestConfig.dropError,
+                tipToBarError: bestConfig.tipToBarError
             });
         }
 
@@ -518,7 +563,7 @@
 
         function updateShoppingList(results) {
             let shoppingList = `
-                <strong>🎯 OPTIMIZED STEM CONFIGURATION!</strong><br><br>
+                <strong>🎯 BIKE FIT OPTIMIZED!</strong><br><br>
                 📏 <strong>Reach:</strong> ${document.getElementById('reach').value}mm<br>
                 📐 <strong>Stack:</strong> ${document.getElementById('stack').value}mm<br>
                 🪑 <strong>Seat Angle:</strong> ${document.getElementById('seatAngle').value}°<br>
@@ -535,15 +580,22 @@
                 🔧 <strong>Spacers:</strong> ${results.spacerHeight}mm<br>
                 🔧 <strong>Stem Height:</strong> 40mm (constant)<br>
                 🔧 <strong>Stem Length:</strong> ${results.stemLength}mm<br>
-                📐 <strong>Stem Angle:</strong> ${results.stemAngle}° from ⊥<br>
+                📐 <strong>Stem Angle:</strong> ${results.stemAngle}° from ⊥<br><br>
+                
+                <strong>📏 ACHIEVED FIT:</strong><br>
+                📐 <strong>Actual Drop:</strong> ${results.actualDrop || 'calculating...'}mm (target: ${document.getElementById('saddleToBarHeight').value}mm)<br>
+                📏 <strong>Actual Tip-to-Bar:</strong> ${results.actualTipToBar || 'calculating...'}mm (target: ${document.getElementById('saddleTipToBarCenter').value}mm)<br>
+                🎯 <strong>Drop Error:</strong> ${results.dropError || 0}mm<br>
+                🎯 <strong>Tip-to-Bar Error:</strong> ${results.tipToBarError || 0}mm<br>
             `;
             
             // Add alternative options if available
             if (results.stemOptions && results.stemOptions.length > 1) {
                 shoppingList += `<br><strong>📋 ALTERNATIVES:</strong><br>`;
-                for (let i = 1; i < Math.min(3, results.stemOptions.length); i++) {
+                for (let i = 1; i < Math.min(4, results.stemOptions.length); i++) {
                     const option = results.stemOptions[i];
-                    shoppingList += `${i + 1}. ${option.spacers}mm spacers + ${option.stemLength}mm stem + ${option.stemAngle}° (${Math.round(option.error * 10) / 10}mm error)<br>`;
+                    shoppingList += `${i + 1}. ${option.spacers}mm spacers + ${option.stemLength}mm stem + ${option.stemAngle}°<br>`;
+                    shoppingList += `   → ${option.actualDrop}mm drop, ${option.actualTipToBar}mm tip-to-bar<br>`;
                 }
             }
             
@@ -892,6 +944,43 @@
             const stemEndX = stemBodyTopX + (stemLength * scale) * Math.cos(stemAngleRad);
             const stemEndY = stemBodyTopY + (stemLength * scale) * Math.sin(stemAngleRad);
             
+            // DEBUG: Compare with optimization calculation
+            console.log('\n=== VISUALIZATION vs OPTIMIZATION COMPARISON ===');
+            console.log('Visualization stem end position:', { 
+                x: Math.round(stemEndX), 
+                y: Math.round(stemEndY),
+                config: `${spacerDistance}mm + ${stemLength}mm + ${stemAngle}°`
+            });
+            
+            // Find the same configuration in optimization results to compare
+            if (window.allOptimizationConfigs) {
+                const matchingOpt = window.allOptimizationConfigs.find(opt => 
+                    opt.spacers === spacerDistance && 
+                    opt.stemLength === stemLength && 
+                    opt.stemAngle === stemAngle
+                );
+                if (matchingOpt) {
+                    console.log('Optimization same config position:', { 
+                        x: Math.round(matchingOpt.actualX), 
+                        y: Math.round(matchingOpt.actualY),
+                        actualDrop: matchingOpt.actualDrop,
+                        actualTipToBar: matchingOpt.actualTipToBar
+                    });
+                    console.log('Position difference:', {
+                        deltaX: Math.round(stemEndX - matchingOpt.actualX),
+                        deltaY: Math.round(stemEndY - matchingOpt.actualY)
+                    });
+                    
+                    if (Math.abs(stemEndX - matchingOpt.actualX) > 5 || Math.abs(stemEndY - matchingOpt.actualY) > 5) {
+                        console.log('⚠️  POSITION MISMATCH DETECTED! Optimization and visualization disagree.');
+                    } else {
+                        console.log('✅ Positions match - calculations are consistent.');
+                    }
+                } else {
+                    console.log('❌ No matching optimization config found for comparison.');
+                }
+            }
+            
             // Draw STEM (line extending from stem body top)
             const stemElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             stemElement.setAttribute('x1', stemBodyTopX);
@@ -1088,6 +1177,13 @@
             saddleToBarLine.setAttribute('stroke-dasharray', '4,4');
             svg.appendChild(saddleToBarLine);
 
+            // Use actual drop from optimization results
+            const actualDrop = params.actualDrop || ((handlebarY - saddleCenterY) / scale);
+            const dropError = params.dropError || Math.abs(actualDrop - saddleToBarHeight);
+            
+            // Color code based on error
+            const dropErrorColor = dropError <= 5 ? '#27ae60' : dropError <= 15 ? '#f39c12' : '#e74c3c';
+            
             // Saddle-to-bar height label
             const saddleToBarText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             saddleToBarText.setAttribute('x', saddleCenterX - 90);
@@ -1095,8 +1191,9 @@
             saddleToBarText.setAttribute('class', 'measurement-text');
             saddleToBarText.setAttribute('font-weight', 'bold');
             saddleToBarText.setAttribute('font-size', '12px');
+            saddleToBarText.setAttribute('fill', dropErrorColor);
             saddleToBarText.setAttribute('transform', `rotate(-90, ${saddleCenterX - 90}, ${(saddleCenterY + handlebarY) / 2})`);
-            saddleToBarText.textContent = `SADDLE DROP: ${saddleToBarHeight}mm`;
+            saddleToBarText.textContent = `ACTUAL DROP: ${Math.round(actualDrop)}mm (target: ${saddleToBarHeight}mm, ±${Math.round(dropError)}mm)`;
             svg.appendChild(saddleToBarText);
 
             // Tip-to-bar center measurement (diagonal line) - THE KEY BIKE FIT MEASUREMENT
@@ -1110,6 +1207,16 @@
             tipToBarLine.setAttribute('stroke-dasharray', '8,8');
             svg.appendChild(tipToBarLine);
 
+            // Use actual tip-to-bar from optimization results
+            const actualTipToBar = params.actualTipToBar || Math.sqrt(
+                Math.pow((handlebarX - saddleTipX) / scale, 2) + 
+                Math.pow((handlebarY - saddleTipY) / scale, 2)
+            );
+            const tipToBarError = params.tipToBarError || Math.abs(actualTipToBar - saddleTipToBarCenter);
+            
+            // Color code based on error
+            const tipToBarErrorColor = tipToBarError <= 10 ? '#27ae60' : tipToBarError <= 25 ? '#f39c12' : '#e74c3c';
+            
             // Tip-to-bar center label
             const tipToBarText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             tipToBarText.setAttribute('x', (saddleTipX + handlebarX) / 2);
@@ -1118,8 +1225,39 @@
             tipToBarText.setAttribute('font-weight', 'bold');
             tipToBarText.setAttribute('font-size', '12px');
             tipToBarText.setAttribute('text-anchor', 'middle');
-            tipToBarText.textContent = `TIP-TO-BAR: ${saddleTipToBarCenter}mm`;
+            tipToBarText.setAttribute('fill', tipToBarErrorColor);
+            tipToBarText.textContent = `ACTUAL: ${Math.round(actualTipToBar)}mm (target: ${saddleTipToBarCenter}mm, ±${Math.round(tipToBarError)}mm)`;
             svg.appendChild(tipToBarText);
+            
+            // Add overall fit quality indicator
+            if (params.dropError !== undefined && params.tipToBarError !== undefined) {
+                const overallError = Math.max(dropError, tipToBarError);
+                let fitQuality, fitColor, fitSymbol;
+                
+                if (overallError <= 5) {
+                    fitQuality = 'EXCELLENT FIT';
+                    fitColor = '#27ae60';
+                    fitSymbol = '🎯';
+                } else if (overallError <= 15) {
+                    fitQuality = 'GOOD FIT';
+                    fitColor = '#f39c12';
+                    fitSymbol = '✅';
+                } else {
+                    fitQuality = 'ACCEPTABLE FIT';
+                    fitColor = '#e74c3c';
+                    fitSymbol = '⚠️';
+                }
+                
+                const fitIndicator = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                fitIndicator.setAttribute('x', bbX + 50);
+                fitIndicator.setAttribute('y', bbY - 30);
+                fitIndicator.setAttribute('class', 'measurement-text');
+                fitIndicator.setAttribute('font-weight', 'bold');
+                fitIndicator.setAttribute('font-size', '16px');
+                fitIndicator.setAttribute('fill', fitColor);
+                fitIndicator.textContent = `${fitSymbol} ${fitQuality}`;
+                svg.appendChild(fitIndicator);
+            }
         }
 
 
