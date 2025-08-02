@@ -423,11 +423,13 @@
 
         function updateShoppingList(results) {
             const shoppingList = `
-                <strong>🎯 Step 2: Seat Tube Added</strong><br><br>
+                <strong>🎯 Step 3: Head Tube Added</strong><br><br>
                 📏 <strong>Reach:</strong> ${document.getElementById('reach').value}mm<br>
                 📐 <strong>Stack:</strong> ${document.getElementById('stack').value}mm<br>
                 🪑 <strong>Seat Angle:</strong> ${document.getElementById('seatAngle').value}°<br>
-                📏 <strong>Seat Tube C-T:</strong> ${document.getElementById('seatTube').value}mm<br><br>
+                📏 <strong>Seat Tube C-T:</strong> ${document.getElementById('seatTube').value}mm<br>
+                🔧 <strong>Head Angle:</strong> ${document.getElementById('headAngle').value}°<br>
+                📏 <strong>Head Tube:</strong> ${document.getElementById('headTube').value}mm<br><br>
                 <strong>✅ What you should see:</strong><br>
                 • Red BB center point<br>
                 • Blue head tube top point<br>
@@ -435,8 +437,9 @@
                 • Blue stack line (vertical)<br>
                 • Dark gray seat tube (from BB)<br>
                 • Orange seat tube measurement<br>
-                • Orange C-T measurement point<br><br>
-                <em>This makes more sense - seat tube connects to BB!</em>
+                • Dark gray head tube (angled)<br>
+                • Purple head tube measurement<br><br>
+                <em>Now we have both main frame tubes!</em>
             `;
             document.getElementById('shoppingList').innerHTML = shoppingList;
         }
@@ -459,6 +462,8 @@
             const stack = params.stack || 580;
             const seatAngle = params.seatAngle || 73.75;
             const seatTube = params.seatTube || 536;
+            const headAngle = params.headAngle || 72.25;
+            const headTube = params.headTube || 157;
 
             // Head tube top position (scaled) - still needed for measurements
             const headTubeTopX = bbX + (reach * scale);
@@ -471,7 +476,13 @@
             const seatTubeTopX = bbX - (seatTubeCTLength) * Math.cos(seatAngleRad);
             const seatTubeTopY = bbY - (seatTubeCTLength) * Math.sin(seatAngleRad);
 
-            // === STEP 2: BB, STACK, REACH + SEAT TUBE ===
+            // Calculate head tube bottom position
+            // Head angle is measured from horizontal (72.25° clockwise from horizontal)
+            const headAngleRad = (headAngle * Math.PI) / 180;
+            const headTubeBottomX = headTubeTopX + (headTube * scale) * Math.cos(headAngleRad);
+            const headTubeBottomY = headTubeTopY + (headTube * scale) * Math.sin(headAngleRad);
+
+            // === STEP 3: BB, STACK, REACH + SEAT TUBE + HEAD TUBE ===
             
             // 1. Draw Bottom Bracket (origin point)
             const bbCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -594,6 +605,46 @@
             seatAngleText.setAttribute('font-size', '12px');
             seatAngleText.textContent = `SEAT ANGLE: ${seatAngle}°`;
             svg.appendChild(seatAngleText);
+
+            // 6. Draw HEAD TUBE
+            const headTubeElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            headTubeElement.setAttribute('x1', headTubeTopX);
+            headTubeElement.setAttribute('y1', headTubeTopY);
+            headTubeElement.setAttribute('x2', headTubeBottomX);
+            headTubeElement.setAttribute('y2', headTubeBottomY);
+            headTubeElement.setAttribute('stroke', '#34495e');
+            headTubeElement.setAttribute('stroke-width', '6');
+            headTubeElement.setAttribute('stroke-linecap', 'round');
+            svg.appendChild(headTubeElement);
+
+            // Head tube measurement line
+            const headTubeMeasurementLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            headTubeMeasurementLine.setAttribute('x1', headTubeTopX);
+            headTubeMeasurementLine.setAttribute('y1', headTubeTopY);
+            headTubeMeasurementLine.setAttribute('x2', headTubeBottomX);
+            headTubeMeasurementLine.setAttribute('y2', headTubeBottomY);
+            headTubeMeasurementLine.setAttribute('stroke', '#9b59b6');
+            headTubeMeasurementLine.setAttribute('stroke-width', '2');
+            headTubeMeasurementLine.setAttribute('stroke-dasharray', '3,3');
+            svg.appendChild(headTubeMeasurementLine);
+
+            // Head tube length label
+            const headTubeText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            headTubeText.setAttribute('x', headTubeBottomX + 15);
+            headTubeText.setAttribute('y', (headTubeTopY + headTubeBottomY) / 2);
+            headTubeText.setAttribute('class', 'measurement-text');
+            headTubeText.setAttribute('font-weight', 'bold');
+            headTubeText.textContent = `HEAD TUBE: ${headTube}mm`;
+            svg.appendChild(headTubeText);
+
+            // Head angle label
+            const headAngleText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            headAngleText.setAttribute('x', headTubeTopX + 20);
+            headAngleText.setAttribute('y', headTubeTopY - 5);
+            headAngleText.setAttribute('class', 'measurement-text');
+            headAngleText.setAttribute('font-size', '12px');
+            headAngleText.textContent = `HEAD ANGLE: ${headAngle}°`;
+            svg.appendChild(headAngleText);
 
             // 6. Add labels for the points
             const bbLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
