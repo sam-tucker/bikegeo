@@ -230,10 +230,6 @@
                         <input type="number" id="stack" step="0.1" placeholder="580">
                     </div>
                     <div class="form-row">
-                        <label for="topTube">Top Tube (effective):</label>
-                        <input type="number" id="topTube" step="0.1" placeholder="548">
-                    </div>
-                    <div class="form-row">
                         <label for="seatTube">Seat Tube C-T:</label>
                         <input type="number" id="seatTube" step="0.1" placeholder="536">
                     </div>
@@ -248,10 +244,6 @@
                     <div class="form-row">
                         <label for="headTube">Head Tube:</label>
                         <input type="number" id="headTube" step="0.1" placeholder="157">
-                    </div>
-                    <div class="form-row">
-                        <label for="bbDrop">BB Drop:</label>
-                        <input type="number" id="bbDrop" step="0.1" placeholder="72">
                     </div>
                 </div>
 
@@ -333,11 +325,7 @@
                     <div class="result-status" id="spacerStatus">Enter measurements</div>
                 </div>
 
-                <div class="result-item">
-                    <h4>Effective Top Tube</h4>
-                    <div class="result-value" id="effectiveTopTube">-- mm</div>
-                    <div class="result-status" id="topTubeStatus">Calculated reach</div>
-                </div>
+
 
                 <div class="input-group" style="margin-top: 30px;">
                     <h3>📋 Shopping List</h3>
@@ -358,21 +346,19 @@
             const headAngle = parseFloat(document.getElementById('headAngle').value) || 72.25;
             const seatAngle = parseFloat(document.getElementById('seatAngle').value) || 73.75;
             const headTube = parseFloat(document.getElementById('headTube').value) || 157;
-            const bbDrop = parseFloat(document.getElementById('bbDrop').value) || 72;
+            const bbDrop = 72; // Fixed value since not needed for bike fit calculations
             
             // For now, just show placeholder values for calculations
             // We'll focus on getting the frame geometry right first
             const seatpostSetback = 25; // Placeholder
             const stemLength = 90; // Placeholder  
             const spacerHeight = 20; // Placeholder
-            const effectiveTopTube = reach + 90; // Placeholder calculation
 
             // Update results with placeholder values
             updateResults({
                 seatpostSetback: seatpostSetback,
                 stemLength: stemLength,
-                spacerHeight: spacerHeight,
-                effectiveTopTube: effectiveTopTube
+                spacerHeight: spacerHeight
             });
 
             // Draw the bike frame with actual geometry
@@ -414,8 +400,7 @@
                 spacerStatus.innerHTML = '<span class="success">✅ Within limits</span>';
             }
 
-            // Effective top tube
-            document.getElementById('effectiveTopTube').textContent = results.effectiveTopTube + ' mm';
+
 
             // Update shopping list
             updateShoppingList(results);
@@ -423,14 +408,13 @@
 
         function updateShoppingList(results) {
             const shoppingList = `
-                <strong>🎯 Step 4: Frame Triangle Complete!</strong><br><br>
+                <strong>🎯 Step 4: Core Frame Geometry!</strong><br><br>
                 📏 <strong>Reach:</strong> ${document.getElementById('reach').value}mm<br>
                 📐 <strong>Stack:</strong> ${document.getElementById('stack').value}mm<br>
                 🪑 <strong>Seat Angle:</strong> ${document.getElementById('seatAngle').value}°<br>
                 📏 <strong>Seat Tube C-T:</strong> ${document.getElementById('seatTube').value}mm<br>
                 🔧 <strong>Head Angle:</strong> ${document.getElementById('headAngle').value}°<br>
-                📏 <strong>Head Tube:</strong> ${document.getElementById('headTube').value}mm<br>
-                📏 <strong>Top Tube:</strong> ${document.getElementById('topTube').value}mm<br><br>
+                📏 <strong>Head Tube:</strong> ${document.getElementById('headTube').value}mm<br><br>
                 <strong>✅ What you should see:</strong><br>
                 • Red BB center point<br>
                 • Blue head tube top point<br>
@@ -440,9 +424,8 @@
                 • Orange seat tube measurement<br>
                 • Dark gray head tube (angled)<br>
                 • Purple head tube measurement<br>
-                • Dark gray top tube (connecting the triangle)<br>
-                • Green top tube measurement<br><br>
-                <em>Complete main frame triangle! 🎉</em>
+                • Dark gray top tube (visual connection)<br><br>
+                <em>Ready for bike fit calculations! 🚴‍♂️</em>
             `;
             document.getElementById('shoppingList').innerHTML = shoppingList;
         }
@@ -467,7 +450,7 @@
             const seatTube = params.seatTube || 536;
             const headAngle = params.headAngle || 72.25;
             const headTube = params.headTube || 157;
-            const topTube = params.topTube || 548;
+
 
             // Head tube top position (scaled) - still needed for measurements
             const headTubeTopX = bbX + (reach * scale);
@@ -661,26 +644,7 @@
             topTubeElement.setAttribute('stroke-linecap', 'round');
             svg.appendChild(topTubeElement);
 
-            // Top tube measurement line
-            const topTubeMeasurementLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            topTubeMeasurementLine.setAttribute('x1', seatTubeTopX);
-            topTubeMeasurementLine.setAttribute('y1', seatTubeTopY);
-            topTubeMeasurementLine.setAttribute('x2', headTubeTopX);
-            topTubeMeasurementLine.setAttribute('y2', headTubeTopY);
-            topTubeMeasurementLine.setAttribute('stroke', '#27ae60');
-            topTubeMeasurementLine.setAttribute('stroke-width', '2');
-            topTubeMeasurementLine.setAttribute('stroke-dasharray', '3,3');
-            svg.appendChild(topTubeMeasurementLine);
 
-            // Top tube length label
-            const topTubeText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            topTubeText.setAttribute('x', (seatTubeTopX + headTubeTopX) / 2);
-            topTubeText.setAttribute('y', (seatTubeTopY + headTubeTopY) / 2 - 10);
-            topTubeText.setAttribute('class', 'measurement-text');
-            topTubeText.setAttribute('font-weight', 'bold');
-            topTubeText.setAttribute('text-anchor', 'middle');
-            topTubeText.textContent = `TOP TUBE: ${topTube}mm`;
-            svg.appendChild(topTubeText);
 
             // 6. Add labels for the points
             const bbLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -711,12 +675,10 @@
             // Frame geometry
             document.getElementById('reach').value = 378;
             document.getElementById('stack').value = 580;
-            document.getElementById('topTube').value = 548;
             document.getElementById('seatTube').value = 536;
             document.getElementById('headAngle').value = 72.25;
             document.getElementById('seatAngle').value = 73.75;
             document.getElementById('headTube').value = 157;
-            document.getElementById('bbDrop').value = 72;
 
             // Bike fit (optimal values)
             document.getElementById('saddleHeight').value = 760;
