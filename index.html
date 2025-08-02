@@ -355,6 +355,7 @@
             const saddleTipToBB = parseFloat(document.getElementById('saddleTipToBB').value) || 91;
             const saddleRailPosition = parseFloat(document.getElementById('saddleRailPosition').value) || 0;
             const saddleToBarHeight = parseFloat(document.getElementById('saddleToBarHeight').value) || 64;
+            const saddleTipToBarCenter = parseFloat(document.getElementById('saddleTipToBarCenter').value) || 550;
             
             // === SEATPOST SETBACK CALCULATION ===
             // Calculate required seatpost setback to achieve target tip-to-BB distance
@@ -392,7 +393,7 @@
             // Draw the bike frame with actual geometry and fit data
             drawBikeDiagram({
                 reach, stack, headAngle, seatAngle, headTube, seatTube, bbDrop,
-                saddleHeight, saddleLength, seatpostSetback, saddleTipToBB, saddleRailPosition, saddleToBarHeight
+                saddleHeight, saddleLength, seatpostSetback, saddleTipToBB, saddleRailPosition, saddleToBarHeight, saddleTipToBarCenter
             });
         }
 
@@ -437,7 +438,7 @@
 
         function updateShoppingList(results) {
             const shoppingList = `
-                <strong>🎯 Step 6: Handlebars Added!</strong><br><br>
+                <strong>🎯 Step 6: Handlebars Positioned by Fit!</strong><br><br>
                 📏 <strong>Reach:</strong> ${document.getElementById('reach').value}mm<br>
                 📐 <strong>Stack:</strong> ${document.getElementById('stack').value}mm<br>
                 🪑 <strong>Seat Angle:</strong> ${document.getElementById('seatAngle').value}°<br>
@@ -447,7 +448,8 @@
                 🏍️ <strong>Saddle Height:</strong> ${document.getElementById('saddleHeight').value}mm<br>
                 📏 <strong>Saddle Length:</strong> ${document.getElementById('saddleLength').value}mm<br>
                 🎯 <strong>Target Tip-to-BB:</strong> ${document.getElementById('saddleTipToBB').value}mm<br>
-                📐 <strong>Saddle-Bar Drop:</strong> ${document.getElementById('saddleToBarHeight').value}mm<br><br>
+                📐 <strong>Saddle-Bar Drop:</strong> ${document.getElementById('saddleToBarHeight').value}mm<br>
+                📏 <strong>Tip-to-Bar Center:</strong> ${document.getElementById('saddleTipToBarCenter').value}mm<br><br>
                 <strong>✅ What you should see:</strong><br>
                 • Red BB center point<br>
                 • Blue head tube top point<br>
@@ -455,12 +457,13 @@
                 • Dark gray frame triangle<br>
                 • Dark seatpost (shaft + setback head)<br>
                 • Purple saddle with red tip marker<br>
-                • Teal handlebar circle (positioned by height diff)<br>
+                • Teal handlebar circle (positioned by trigonometry)<br>
                 • Orange saddle height (straight up seatpost)<br>
                 • Red tip-to-BB (horizontal measurement)<br>
-                • Purple saddle-to-bar height measurement<br>
+                • Purple saddle drop measurement<br>
+                • Green tip-to-bar diagonal measurement<br>
                 • Calculated setback label<br><br>
-                <em>Handlebars positioned by fit data! 🚴‍♂️</em>
+                <em>Handlebars positioned by bike fit trigonometry! 🚴‍♂️</em>
             `;
             document.getElementById('shoppingList').innerHTML = shoppingList;
         }
@@ -709,6 +712,7 @@
             const saddleTipToBB = params.saddleTipToBB || 91;
             const saddleRailPosition = params.saddleRailPosition || 0;
             const saddleToBarHeight = params.saddleToBarHeight || 64;
+            const saddleTipToBarCenter = params.saddleTipToBarCenter || 550;
             
             // Calculate seatpost length: saddleHeight - seatTube
             const seatpostLength = saddleHeight - seatTube;
@@ -779,11 +783,19 @@
 
             // === HANDLEBARS ===
             
-            // Calculate handlebar position
-            // X: Same as head tube top (for now)
-            // Y: Saddle center Y + saddle-to-bar height difference
-            const handlebarX = headTubeTopX;
-            const handlebarY = saddleCenterY + (saddleToBarHeight * scale); // Positive value means bars lower than saddle
+            // Calculate handlebar position using trigonometry
+            // We know: diagonal distance (tip to bar center) and vertical distance (saddle drop)
+            // Calculate: horizontal distance using Pythagorean theorem
+            
+            const diagonalDistance = saddleTipToBarCenter; // 550mm diagonal
+            const verticalDistance = saddleToBarHeight; // 64mm drop
+            
+            // Horizontal distance = √(diagonal² - vertical²)
+            const horizontalDistance = Math.sqrt((diagonalDistance * diagonalDistance) - (verticalDistance * verticalDistance));
+            
+            // Position handlebars relative to saddle tip
+            const handlebarX = saddleTipX + (horizontalDistance * scale); // Forward from saddle tip
+            const handlebarY = saddleCenterY + (saddleToBarHeight * scale); // Drop from saddle center
             
             // 10. Draw HANDLEBARS (circle - side view)
             const handlebarCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -869,6 +881,28 @@
             saddleToBarText.setAttribute('transform', `rotate(-90, ${saddleCenterX - 90}, ${(saddleCenterY + handlebarY) / 2})`);
             saddleToBarText.textContent = `SADDLE DROP: ${saddleToBarHeight}mm`;
             svg.appendChild(saddleToBarText);
+
+            // Tip-to-bar center measurement (diagonal line) - THE KEY BIKE FIT MEASUREMENT
+            const tipToBarLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            tipToBarLine.setAttribute('x1', saddleTipX);
+            tipToBarLine.setAttribute('y1', saddleTipY);
+            tipToBarLine.setAttribute('x2', handlebarX);
+            tipToBarLine.setAttribute('y2', handlebarY);
+            tipToBarLine.setAttribute('stroke', '#27ae60');
+            tipToBarLine.setAttribute('stroke-width', '3');
+            tipToBarLine.setAttribute('stroke-dasharray', '8,8');
+            svg.appendChild(tipToBarLine);
+
+            // Tip-to-bar center label
+            const tipToBarText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            tipToBarText.setAttribute('x', (saddleTipX + handlebarX) / 2);
+            tipToBarText.setAttribute('y', (saddleTipY + handlebarY) / 2 - 10);
+            tipToBarText.setAttribute('class', 'measurement-text');
+            tipToBarText.setAttribute('font-weight', 'bold');
+            tipToBarText.setAttribute('font-size', '12px');
+            tipToBarText.setAttribute('text-anchor', 'middle');
+            tipToBarText.textContent = `TIP-TO-BAR: ${saddleTipToBarCenter}mm`;
+            svg.appendChild(tipToBarText);
         }
 
 
