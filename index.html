@@ -304,7 +304,7 @@
                 <svg id="bikeSvg" width="600" height="400" viewBox="0 0 600 400">
                     <defs>
                         <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                            <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c" />
+                            <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" />
                         </marker>
                     </defs>
                     <!-- Bike frame will be drawn here -->
@@ -350,120 +350,34 @@
     </div>
 
     <script>
-        // Bike fit calculation functions
+        // Simplified frame geometry visualization
         function calculateBikeFit() {
-            // Get all input values
-            const reach = parseFloat(document.getElementById('reach').value) || 0;
-            const stack = parseFloat(document.getElementById('stack').value) || 0;
-            const headAngle = parseFloat(document.getElementById('headAngle').value) || 73;
-            const seatAngle = parseFloat(document.getElementById('seatAngle').value) || 73;
-            const headTube = parseFloat(document.getElementById('headTube').value) || 150;
-            const bbDrop = parseFloat(document.getElementById('bbDrop').value) || 70;
+            // Get frame geometry values
+            const reach = parseFloat(document.getElementById('reach').value) || 378;
+            const stack = parseFloat(document.getElementById('stack').value) || 580;
+            const headAngle = parseFloat(document.getElementById('headAngle').value) || 72.25;
+            const seatAngle = parseFloat(document.getElementById('seatAngle').value) || 73.75;
+            const headTube = parseFloat(document.getElementById('headTube').value) || 157;
+            const bbDrop = parseFloat(document.getElementById('bbDrop').value) || 72;
             
-            const saddleHeight = parseFloat(document.getElementById('saddleHeight').value) || 0;
-            const saddleTipToBB = parseFloat(document.getElementById('saddleTipToBB').value) || 0;
-            const saddleToBarHeight = parseFloat(document.getElementById('saddleToBarHeight').value) || 0;
-            const saddleTipToBarCenter = parseFloat(document.getElementById('saddleTipToBarCenter').value) || 0;
-            
-            const saddleLength = parseFloat(document.getElementById('saddleLength').value) || 250;
-            const stemAngle = parseFloat(document.getElementById('stemAngle').value) || -6;
-            const saddleRailPosition = parseFloat(document.getElementById('saddleRailPosition').value) || 0;
+            // For now, just show placeholder values for calculations
+            // We'll focus on getting the frame geometry right first
+            const seatpostSetback = 25; // Placeholder
+            const stemLength = 90; // Placeholder  
+            const spacerHeight = 20; // Placeholder
+            const effectiveTopTube = reach + 90; // Placeholder calculation
 
-            if (!reach || !stack || !saddleHeight || !saddleTipToBB || !saddleTipToBarCenter) {
-                return; // Not enough data to calculate
-            }
-
-            // Convert angles to radians for calculations
-            const seatAngleRad = (seatAngle * Math.PI) / 180;
-            const headAngleRad = (headAngle * Math.PI) / 180;
-            const stemAngleRad = (stemAngle * Math.PI) / 180;
-
-            // === STEP 1: Calculate desired saddle position ===
-            // Saddle tip position is given as horizontal distance from BB
-            const saddleTipX = saddleTipToBB;
-            const saddleTipY = saddleHeight;
-            
-            // Calculate saddle center position (accounting for saddle length and rail position)
-            const saddleCenterX = saddleTipX - (saddleLength / 2) + saddleRailPosition;
-            const saddleCenterY = saddleHeight;
-            
-            // === STEP 2: Calculate required seatpost setback ===
-            // Where would saddle center be if seatpost followed seat tube angle exactly?
-            const seatTubeX = saddleHeight * Math.sin(seatAngleRad - Math.PI/2); // negative because seat tube leans back
-            const seatpostSetback = saddleCenterX - seatTubeX;
-            
-            // === STEP 3: Calculate desired handlebar position ===
-            const barX = saddleTipX + saddleTipToBarCenter;
-            const barY = saddleHeight + saddleToBarHeight;
-            
-            // === STEP 4: Calculate stem requirements ===
-            // Head tube top is at (reach, stack) relative to BB
-            const headTubeTopX = reach;
-            const headTubeTopY = stack;
-            
-            // We need to find spacer height and stem length that gets us to (barX, barY)
-            // Start with a reasonable spacer height and calculate resulting stem length
-            let spacerHeight = 20; // Start with 20mm spacers
-            let stemLength;
-            
-            // Try different spacer heights to find reasonable stem length
-            for (let testSpacers = 0; testSpacers <= 50; testSpacers += 5) {
-                // Stem mount point (head tube top + spacers)
-                const stemMountX = headTubeTopX;
-                const stemMountY = headTubeTopY + testSpacers;
-                
-                // Vector from stem mount to desired bar position
-                const deltaX = barX - stemMountX;
-                const deltaY = barY - stemMountY;
-                
-                // Calculate required stem length for this spacer height
-                const testStemLength = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                
-                // Calculate what stem angle this would create
-                const actualStemAngle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
-                
-                // Check if this is close to our desired angle (within 3 degrees)
-                if (Math.abs(actualStemAngle - stemAngle) < 3 && testStemLength >= 70 && testStemLength <= 140) {
-                    spacerHeight = testSpacers;
-                    stemLength = testStemLength;
-                    break;
-                }
-            }
-            
-            // If no good solution found, calculate directly
-            if (!stemLength || stemLength < 70 || stemLength > 140) {
-                // Direct calculation: solve for spacer height that gives reasonable stem length
-                // Assume stem length of 100mm and work backwards
-                const assumedStemLength = 100;
-                const stemHorizontal = assumedStemLength * Math.cos(stemAngleRad);
-                const stemVertical = assumedStemLength * Math.sin(stemAngleRad);
-                
-                spacerHeight = Math.max(0, barY - headTubeTopY - stemVertical);
-                stemLength = assumedStemLength;
-                
-                // Recalculate with actual spacer height
-                const stemMountY = headTubeTopY + spacerHeight;
-                const deltaX = barX - headTubeTopX;
-                const deltaY = barY - stemMountY;
-                stemLength = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            }
-            
-            // === STEP 5: Calculate effective top tube ===
-            const effectiveTopTube = reach + (stemLength * Math.cos(stemAngleRad));
-
-            // Update results
+            // Update results with placeholder values
             updateResults({
-                seatpostSetback: Math.round(seatpostSetback * 10) / 10,
-                stemLength: Math.round(stemLength * 10) / 10,
-                spacerHeight: Math.round(spacerHeight * 10) / 10,
-                effectiveTopTube: Math.round(effectiveTopTube * 10) / 10
+                seatpostSetback: seatpostSetback,
+                stemLength: stemLength,
+                spacerHeight: spacerHeight,
+                effectiveTopTube: effectiveTopTube
             });
 
-            // Update bike diagram
+            // Draw the bike frame with actual geometry
             drawBikeDiagram({
-                reach, stack, headAngle, seatAngle, headTube, bbDrop,
-                saddleHeight, seatpostSetback, stemLength, spacerHeight,
-                barX, barY, saddleX: saddleCenterX, saddleY: saddleCenterY
+                reach, stack, headAngle, seatAngle, headTube, bbDrop
             });
         }
 
@@ -508,141 +422,129 @@
         }
 
         function updateShoppingList(results) {
-            const seatpostType = results.seatpostSetback >= 20 ? 'Layback seatpost' : 'Straight seatpost with setback saddle clamp';
-            const stemLengthRounded = Math.round(results.stemLength / 10) * 10; // Round to nearest 10mm
-            
             const shoppingList = `
-                <strong>🛒 Recommended Components:</strong><br><br>
-                📏 <strong>Stem:</strong> ${stemLengthRounded}mm, ${document.getElementById('stemAngle').value}° angle<br>
-                🪑 <strong>Seatpost:</strong> ${seatpostType} (${results.seatpostSetback.toFixed(1)}mm setback)<br>
-                📏 <strong>Spacers:</strong> ${results.spacerHeight.toFixed(1)}mm stack height<br>
-                📐 <strong>Effective reach:</strong> ${results.effectiveTopTube.toFixed(1)}mm
+                <strong>🎯 Step 1: Basic Geometry</strong><br><br>
+                📏 <strong>Reach:</strong> ${document.getElementById('reach').value}mm<br>
+                📐 <strong>Stack:</strong> ${document.getElementById('stack').value}mm<br><br>
+                <strong>✅ What you should see:</strong><br>
+                • Red BB center point<br>
+                • Blue head tube top point<br>
+                • Horizontal red line (reach)<br>
+                • Vertical blue line (stack)<br><br>
+                <em>Once this looks correct, we'll add Step 2...</em>
             `;
             document.getElementById('shoppingList').innerHTML = shoppingList;
         }
 
         function drawBikeDiagram(params) {
             const svg = document.getElementById('bikeSvg');
-            const scale = 0.6; // Scale factor for diagram
+            const scale = 0.8; // Larger scale for better visibility
             const offsetX = 50;
             const offsetY = 50;
             
             // Clear previous drawing
             svg.innerHTML = svg.querySelector('defs').outerHTML;
 
-            // Calculate positions (scaled and offset)
-            const bbX = offsetX + 200;
-            const bbY = offsetY + 250;
-            const seatX = bbX + (params.saddleX * scale);
-            const seatY = bbY - (params.saddleHeight * scale);
-            const barX = bbX + (params.barX * scale);
-            const barY = bbY - ((params.barY - params.bbDrop) * scale);
-            const headTubeTopX = bbX + (params.reach * scale);
-            const headTubeTopY = bbY - (params.stack * scale);
+            // Bottom bracket is our origin point
+            const bbX = offsetX + 150;
+            const bbY = offsetY + 300;
 
-            // Draw bike frame
-            const frameGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-            frameGroup.setAttribute('stroke', '#2c3e50');
-            frameGroup.setAttribute('stroke-width', '3');
-            frameGroup.setAttribute('fill', 'none');
+            // Frame geometry values
+            const reach = params.reach || 378;
+            const stack = params.stack || 580;
 
-            // Wheels
-            const rearWheel = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            rearWheel.setAttribute('cx', bbX - 50);
-            rearWheel.setAttribute('cy', bbY);
-            rearWheel.setAttribute('r', 60);
-            frameGroup.appendChild(rearWheel);
+            // Head tube top position (scaled)
+            const headTubeTopX = bbX + (reach * scale);
+            const headTubeTopY = bbY - (stack * scale);
 
-            const frontWheel = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            frontWheel.setAttribute('cx', bbX + 400);
-            frontWheel.setAttribute('cy', bbY);
-            frontWheel.setAttribute('r', 60);
-            frameGroup.appendChild(frontWheel);
+            // === STEP 1: ONLY BB, STACK, and REACH ===
+            
+            // 1. Draw Bottom Bracket (origin point)
+            const bbCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            bbCircle.setAttribute('cx', bbX);
+            bbCircle.setAttribute('cy', bbY);
+            bbCircle.setAttribute('r', 8);
+            bbCircle.setAttribute('fill', '#e74c3c');
+            bbCircle.setAttribute('stroke', '#c0392b');
+            bbCircle.setAttribute('stroke-width', '2');
+            svg.appendChild(bbCircle);
 
-            // Frame tubes
-            // Seat tube
-            const seatTube = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            seatTube.setAttribute('x1', bbX);
-            seatTube.setAttribute('y1', bbY);
-            seatTube.setAttribute('x2', seatX);
-            seatTube.setAttribute('y2', seatY + 50);
-            frameGroup.appendChild(seatTube);
+            // 2. Draw Head Tube Top point
+            const headTubeTopCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            headTubeTopCircle.setAttribute('cx', headTubeTopX);
+            headTubeTopCircle.setAttribute('cy', headTubeTopY);
+            headTubeTopCircle.setAttribute('r', 4);
+            headTubeTopCircle.setAttribute('fill', '#3498db');
+            headTubeTopCircle.setAttribute('stroke', '#2980b9');
+            headTubeTopCircle.setAttribute('stroke-width', '1');
+            svg.appendChild(headTubeTopCircle);
 
-            // Top tube
-            const topTube = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            topTube.setAttribute('x1', seatX);
-            topTube.setAttribute('y1', seatY + 50);
-            topTube.setAttribute('x2', headTubeTopX);
-            topTube.setAttribute('y2', headTubeTopY);
-            frameGroup.appendChild(topTube);
+            // 3. Draw REACH measurement (horizontal)
+            const reachLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            reachLine.setAttribute('x1', bbX);
+            reachLine.setAttribute('y1', bbY + 40); // Offset below BB
+            reachLine.setAttribute('x2', headTubeTopX);
+            reachLine.setAttribute('y2', bbY + 40);
+            reachLine.setAttribute('stroke', '#e74c3c');
+            reachLine.setAttribute('stroke-width', '2');
+            reachLine.setAttribute('marker-start', 'url(#arrowhead)');
+            reachLine.setAttribute('marker-end', 'url(#arrowhead)');
+            svg.appendChild(reachLine);
 
-            // Head tube
-            const headTube = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            headTube.setAttribute('x1', headTubeTopX);
-            headTube.setAttribute('y1', headTubeTopY);
-            headTube.setAttribute('x2', headTubeTopX + 20);
-            headTube.setAttribute('y2', headTubeTopY + (params.headTube * scale));
-            frameGroup.appendChild(headTube);
+            // REACH label
+            const reachText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            reachText.setAttribute('x', (bbX + headTubeTopX) / 2);
+            reachText.setAttribute('y', bbY + 60);
+            reachText.setAttribute('text-anchor', 'middle');
+            reachText.setAttribute('class', 'measurement-text');
+            reachText.textContent = `REACH: ${reach}mm`;
+            svg.appendChild(reachText);
 
-            // Down tube
-            const downTube = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            downTube.setAttribute('x1', bbX);
-            downTube.setAttribute('y1', bbY);
-            downTube.setAttribute('x2', headTubeTopX + 20);
-            downTube.setAttribute('y2', headTubeTopY + (params.headTube * scale));
-            frameGroup.appendChild(downTube);
+            // 4. Draw STACK measurement (vertical)
+            const stackLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            stackLine.setAttribute('x1', bbX - 40); // Offset left of BB
+            stackLine.setAttribute('y1', bbY);
+            stackLine.setAttribute('x2', bbX - 40);
+            stackLine.setAttribute('y2', headTubeTopY);
+            stackLine.setAttribute('stroke', '#3498db');
+            stackLine.setAttribute('stroke-width', '2');
+            stackLine.setAttribute('marker-start', 'url(#arrowhead)');
+            stackLine.setAttribute('marker-end', 'url(#arrowhead)');
+            svg.appendChild(stackLine);
 
-            // Stem
-            const stem = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            stem.setAttribute('x1', headTubeTopX);
-            stem.setAttribute('y1', headTubeTopY + (params.spacerHeight * scale));
-            stem.setAttribute('x2', barX);
-            stem.setAttribute('y2', barY);
-            stem.setAttribute('stroke', '#e74c3c');
-            stem.setAttribute('stroke-width', '4');
-            frameGroup.appendChild(stem);
+            // STACK label
+            const stackText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            stackText.setAttribute('x', bbX - 65);
+            stackText.setAttribute('y', (bbY + headTubeTopY) / 2);
+            stackText.setAttribute('text-anchor', 'middle');
+            stackText.setAttribute('class', 'measurement-text');
+            stackText.setAttribute('transform', `rotate(-90, ${bbX - 65}, ${(bbY + headTubeTopY) / 2})`);
+            stackText.textContent = `STACK: ${stack}mm`;
+            svg.appendChild(stackText);
 
-            // Saddle
-            const saddle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            saddle.setAttribute('x', seatX - 40);
-            saddle.setAttribute('y', seatY - 5);
-            saddle.setAttribute('width', 80);
-            saddle.setAttribute('height', 10);
-            saddle.setAttribute('fill', '#2c3e50');
-            frameGroup.appendChild(saddle);
+            // 5. Add labels for the points
+            const bbLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            bbLabel.setAttribute('x', bbX);
+            bbLabel.setAttribute('y', bbY + 25);
+            bbLabel.setAttribute('text-anchor', 'middle');
+            bbLabel.setAttribute('class', 'measurement-text');
+            bbLabel.setAttribute('font-size', '12px');
+            bbLabel.textContent = 'BB CENTER';
+            svg.appendChild(bbLabel);
 
-            // Handlebar
-            const handlebar = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            handlebar.setAttribute('cx', barX);
-            handlebar.setAttribute('cy', barY);
-            handlebar.setAttribute('r', 8);
-            handlebar.setAttribute('fill', '#e74c3c');
-            frameGroup.appendChild(handlebar);
-
-            svg.appendChild(frameGroup);
-
-            // Add measurement annotations
-            addMeasurementLine(svg, bbX, bbY, seatX, seatY, 'Saddle Height', offsetX - 40);
-            addMeasurementLine(svg, headTubeTopX, headTubeTopY, barX, barY, `Stem: ${Math.round(params.stemLength)}mm`, headTubeTopX + 50);
-            addMeasurementLine(svg, headTubeTopX, headTubeTopY, headTubeTopX, headTubeTopY + (params.spacerHeight * scale), `Spacers: ${params.spacerHeight.toFixed(1)}mm`, headTubeTopX + 70);
+            const headLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            headLabel.setAttribute('x', headTubeTopX);
+            headLabel.setAttribute('y', headTubeTopY - 10);
+            headLabel.setAttribute('text-anchor', 'middle');
+            headLabel.setAttribute('class', 'measurement-text');
+            headLabel.setAttribute('font-size', '12px');
+            headLabel.textContent = 'HEAD TUBE TOP';
+            svg.appendChild(headLabel);
         }
 
-        function addMeasurementLine(svg, x1, y1, x2, y2, label, textX) {
-            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            line.setAttribute('x1', x1);
-            line.setAttribute('y1', y1);
-            line.setAttribute('x2', x2);
-            line.setAttribute('y2', y2);
-            line.setAttribute('class', 'measurement-line');
-            svg.appendChild(line);
 
-            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            text.setAttribute('x', textX || (x1 + x2) / 2);
-            text.setAttribute('y', (y1 + y2) / 2 - 5);
-            text.setAttribute('class', 'measurement-text');
-            text.textContent = label;
-            svg.appendChild(text);
-        }
+
+
 
         // Load test data for 54T Strael
         function loadStrael54T() {
