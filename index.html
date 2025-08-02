@@ -258,11 +258,11 @@
                         <input type="number" id="saddleTipToBB" step="0.1" placeholder="91">
                     </div>
                     <div class="form-row">
-                        <label for="saddleToBarHeight">Saddle to Bar Height Diff:</label>
+                        <label for="saddleToBarHeight">Saddle to Bar Top Drop:</label>
                         <input type="number" id="saddleToBarHeight" step="0.1" placeholder="64">
                     </div>
                     <div class="form-row">
-                        <label for="saddleTipToBarCenter">Tip of Saddle to Bar Center:</label>
+                        <label for="saddleTipToBarCenter">Tip of Saddle to Bar Top:</label>
                         <input type="number" id="saddleTipToBarCenter" step="0.1" placeholder="550">
                     </div>
                 </div>
@@ -343,7 +343,7 @@
             const spacerOptions = [0, 10, 20, 30, 40]; // mm
             const stemLengthOptions = [80, 90, 100, 110]; // mm  
             const stemAngleOptions = [10, 6, 0, -6, -10]; // degrees
-            const stemHeight = 40; // mm - constant
+            const stemHeight = 20; // mm - constant
             
             const headAngleRad = headAngle * (Math.PI / 180);
             let allConfigs = [];
@@ -369,11 +369,15 @@
                         const actualBarY = stemBodyTopY + (stemLength * scale) * Math.sin(stemAngleRad);
                         
                         // Calculate actual bike fit measurements achieved
-                        const actualDrop = (actualBarY - saddleCenterY) / scale; // Saddle to bar drop
+                        // Calculate tip-to-bar distance to TOP of handlebar circle (32mm diameter = 16mm radius)
+                        const handlebarRadius = 16; // mm
+                        const actualBarTopY = actualBarY - (handlebarRadius * scale);
+                        
+                        const actualDrop = (actualBarTopY - saddleCenterY) / scale; // Saddle to bar top drop
                         const actualTipToBar = Math.sqrt(
                             Math.pow((actualBarX - saddleTipX) / scale, 2) + 
-                            Math.pow((actualBarY - saddleTipY) / scale, 2)
-                        ); // Tip to bar center distance
+                            Math.pow((actualBarTopY - saddleTipY) / scale, 2)
+                        ); // Tip to bar top distance
                         
                         // Calculate errors for bike fit measurements (prioritize drop)
                         const dropError = Math.abs(actualDrop - targetDrop);
@@ -573,12 +577,12 @@
                 🏍️ <strong>Saddle Height:</strong> ${document.getElementById('saddleHeight').value}mm<br>
                 📏 <strong>Saddle Length:</strong> ${document.getElementById('saddleLength').value}mm<br>
                 🎯 <strong>Target Tip-to-BB:</strong> ${document.getElementById('saddleTipToBB').value}mm<br>
-                📐 <strong>Saddle-Bar Drop:</strong> ${document.getElementById('saddleToBarHeight').value}mm<br>
-                📏 <strong>Tip-to-Bar Center:</strong> ${document.getElementById('saddleTipToBarCenter').value}mm<br><br>
+                📐 <strong>Saddle-Bar Drop (to top):</strong> ${document.getElementById('saddleToBarHeight').value}mm<br>
+                📏 <strong>Tip-to-Bar Top:</strong> ${document.getElementById('saddleTipToBarCenter').value}mm<br><br>
                 
                 <strong>🏆 OPTIMIZED COMPONENTS:</strong><br>
                 🔧 <strong>Spacers:</strong> ${results.spacerHeight}mm<br>
-                🔧 <strong>Stem Height:</strong> 40mm (constant)<br>
+                🔧 <strong>Stem Height:</strong> 20mm (constant)<br>
                 🔧 <strong>Stem Length:</strong> ${results.stemLength}mm<br>
                 📐 <strong>Stem Angle:</strong> ${results.stemAngle}° from ⊥<br><br>
                 
@@ -609,12 +613,12 @@
                 • Purple saddle with red tip marker<br>
                 • Teal handlebar circle (positioned by optimization)<br>
                 • Orange spacers (optimized distance)<br>
-                • Dark gray stem height (constant 40mm component)<br>
+                • Dark gray stem height (constant 20mm component)<br>
                 • Dark gray stem (optimized length & angle)<br>
                 • Orange saddle height (straight up seatpost)<br>
                 • Red tip-to-BB (horizontal measurement)<br>
-                • Purple saddle drop measurement<br>
-                • Green tip-to-bar diagonal measurement<br>
+                • Purple saddle drop measurement (to top of handlebar)<br>
+                • Green tip-to-bar diagonal measurement (to top of handlebar)<br>
                 • All measurement labels<br><br>
                 <em>Components optimized for perfect fit! 🚴‍♂️</em>
             `;
@@ -893,9 +897,9 @@
             spacerText.textContent = `SPACERS: ${spacerDistance}mm`;
             svg.appendChild(spacerText);
 
-            // === STEM HEIGHT (constant 40mm component) ===
+            // === STEM HEIGHT (constant 20mm component) ===
             
-            const stemHeight = 40; // mm - constant stem body height
+            const stemHeight = 20; // mm - constant stem body height
             
             // Calculate stem body top position (extending from spacer top along head tube angle)
             const stemBodyTopX = spacerTopX - (stemHeight * scale) * Math.cos(headAngleRad);
@@ -1103,15 +1107,19 @@
             const handlebarX = stemEndX;
             const handlebarY = stemEndY;
             
-            // 10. Draw HANDLEBARS (circle - side view)
+            // 10. Draw HANDLEBARS (32mm diameter circle - side view)
+            const handlebarRadius = (32 / 2) * scale; // 32mm diameter = 16mm radius, scaled
             const handlebarCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             handlebarCircle.setAttribute('cx', handlebarX);
             handlebarCircle.setAttribute('cy', handlebarY);
-            handlebarCircle.setAttribute('r', 8);
+            handlebarCircle.setAttribute('r', handlebarRadius);
             handlebarCircle.setAttribute('fill', '#16a085');
             handlebarCircle.setAttribute('stroke', '#138d75');
             handlebarCircle.setAttribute('stroke-width', '2');
             svg.appendChild(handlebarCircle);
+            
+            // Calculate top of handlebar circle for measurements
+            const handlebarTopY = handlebarY - handlebarRadius;
 
             // Saddle height measurement (BB to saddle level, straight up seatpost shaft)
             const saddleHeightLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -1166,19 +1174,19 @@
             setbackText.textContent = `SETBACK: ${Math.round(seatpostSetback)}mm`;
             svg.appendChild(setbackText);
 
-            // Saddle-to-bar height measurement (vertical line)
+            // Saddle-to-bar height measurement (vertical line) - to top of handlebar circle
             const saddleToBarLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             saddleToBarLine.setAttribute('x1', saddleCenterX - 30); // Offset to avoid cluttering
             saddleToBarLine.setAttribute('y1', saddleCenterY);
             saddleToBarLine.setAttribute('x2', saddleCenterX - 30);
-            saddleToBarLine.setAttribute('y2', handlebarY);
+            saddleToBarLine.setAttribute('y2', handlebarTopY);
             saddleToBarLine.setAttribute('stroke', '#9b59b6');
             saddleToBarLine.setAttribute('stroke-width', '2');
             saddleToBarLine.setAttribute('stroke-dasharray', '4,4');
             svg.appendChild(saddleToBarLine);
 
             // Use actual drop from optimization results
-            const actualDrop = params.actualDrop || ((handlebarY - saddleCenterY) / scale);
+            const actualDrop = params.actualDrop || ((handlebarTopY - saddleCenterY) / scale);
             const dropError = params.dropError || Math.abs(actualDrop - saddleToBarHeight);
             
             // Color code based on error
@@ -1187,21 +1195,21 @@
             // Saddle-to-bar height label
             const saddleToBarText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             saddleToBarText.setAttribute('x', saddleCenterX - 90);
-            saddleToBarText.setAttribute('y', (saddleCenterY + handlebarY) / 2);
+            saddleToBarText.setAttribute('y', (saddleCenterY + handlebarTopY) / 2);
             saddleToBarText.setAttribute('class', 'measurement-text');
             saddleToBarText.setAttribute('font-weight', 'bold');
             saddleToBarText.setAttribute('font-size', '12px');
             saddleToBarText.setAttribute('fill', dropErrorColor);
-            saddleToBarText.setAttribute('transform', `rotate(-90, ${saddleCenterX - 90}, ${(saddleCenterY + handlebarY) / 2})`);
+            saddleToBarText.setAttribute('transform', `rotate(-90, ${saddleCenterX - 90}, ${(saddleCenterY + handlebarTopY) / 2})`);
             saddleToBarText.textContent = `ACTUAL DROP: ${Math.round(actualDrop)}mm (target: ${saddleToBarHeight}mm, ±${Math.round(dropError)}mm)`;
             svg.appendChild(saddleToBarText);
 
-            // Tip-to-bar center measurement (diagonal line) - THE KEY BIKE FIT MEASUREMENT
+            // Tip-to-bar top measurement (diagonal line) - THE KEY BIKE FIT MEASUREMENT
             const tipToBarLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             tipToBarLine.setAttribute('x1', saddleTipX);
             tipToBarLine.setAttribute('y1', saddleTipY);
             tipToBarLine.setAttribute('x2', handlebarX);
-            tipToBarLine.setAttribute('y2', handlebarY);
+            tipToBarLine.setAttribute('y2', handlebarTopY);
             tipToBarLine.setAttribute('stroke', '#27ae60');
             tipToBarLine.setAttribute('stroke-width', '3');
             tipToBarLine.setAttribute('stroke-dasharray', '8,8');
@@ -1210,17 +1218,17 @@
             // Use actual tip-to-bar from optimization results
             const actualTipToBar = params.actualTipToBar || Math.sqrt(
                 Math.pow((handlebarX - saddleTipX) / scale, 2) + 
-                Math.pow((handlebarY - saddleTipY) / scale, 2)
+                Math.pow((handlebarTopY - saddleTipY) / scale, 2)
             );
             const tipToBarError = params.tipToBarError || Math.abs(actualTipToBar - saddleTipToBarCenter);
             
             // Color code based on error
             const tipToBarErrorColor = tipToBarError <= 10 ? '#27ae60' : tipToBarError <= 25 ? '#f39c12' : '#e74c3c';
             
-            // Tip-to-bar center label
+            // Tip-to-bar top label
             const tipToBarText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             tipToBarText.setAttribute('x', (saddleTipX + handlebarX) / 2);
-            tipToBarText.setAttribute('y', (saddleTipY + handlebarY) / 2 - 10);
+            tipToBarText.setAttribute('y', (saddleTipY + handlebarTopY) / 2 - 10);
             tipToBarText.setAttribute('class', 'measurement-text');
             tipToBarText.setAttribute('font-weight', 'bold');
             tipToBarText.setAttribute('font-size', '12px');
