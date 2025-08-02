@@ -338,6 +338,55 @@
     </div>
 
     <script>
+        function findOptimalStemConfig(headTubeTopX, headTubeTopY, headAngle, targetBarX, targetBarY, scale) {
+            // Standard component options
+            const spacerOptions = [0, 10, 20, 30, 40]; // mm
+            const stemLengthOptions = [80, 90, 100, 110]; // mm  
+            const stemAngleOptions = [10, 6, 0, -6, -10]; // degrees
+            const stemHeight = 40; // mm - constant
+            
+            const headAngleRad = headAngle * (Math.PI / 180);
+            let allConfigs = [];
+            
+            // Try every combination
+            for (let spacers of spacerOptions) {
+                for (let stemLength of stemLengthOptions) {
+                    for (let stemAngle of stemAngleOptions) {
+                        
+                        // Calculate actual handlebar position with this config
+                        
+                        // 1. Spacer position
+                        const spacerTopX = headTubeTopX - (spacers * scale) * Math.cos(headAngleRad);
+                        const spacerTopY = headTubeTopY - (spacers * scale) * Math.sin(headAngleRad);
+                        
+                        // 2. Stem height position  
+                        const stemBodyTopX = spacerTopX - (stemHeight * scale) * Math.cos(headAngleRad);
+                        const stemBodyTopY = spacerTopY - (stemHeight * scale) * Math.sin(headAngleRad);
+                        
+                        // 3. Stem extension
+                        const stemAngleRad = (headAngle - 90 - stemAngle) * (Math.PI / 180);
+                        const actualBarX = stemBodyTopX + (stemLength * scale) * Math.cos(stemAngleRad);
+                        const actualBarY = stemBodyTopY + (stemLength * scale) * Math.sin(stemAngleRad);
+                        
+                        // Calculate error distance from target (convert back to mm)
+                        const errorX = (actualBarX - targetBarX) / scale;
+                        const errorY = (actualBarY - targetBarY) / scale;
+                        const error = Math.sqrt(errorX * errorX + errorY * errorY);
+                        
+                        allConfigs.push({
+                            spacers, stemLength, stemAngle, error,
+                            actualX: actualBarX, actualY: actualBarY,
+                            errorX: Math.round(errorX * 10) / 10,
+                            errorY: Math.round(errorY * 10) / 10
+                        });
+                    }
+                }
+            }
+            
+            // Return top 3 closest matches
+            return allConfigs.sort((a, b) => a.error - b.error).slice(0, 3);
+        }
+
         // Simplified frame geometry visualization
         function calculateBikeFit() {
             // Get frame geometry values
@@ -379,19 +428,47 @@
             
             // Constrain setback to reasonable range (0-30mm)
             const seatpostSetback = Math.max(0, Math.min(30, requiredSetback));
+
+            // === STEM OPTIMIZATION ===
             
-            const stemLength = 90; // Placeholder  
-            const spacerHeight = 20; // Placeholder
+            // Calculate target handlebar position from fit requirements
+            const scale = 0.6; // Same scale as diagram
+            const offsetX = 100;
+            const offsetY = 100;
+            const bbX = offsetX + 200;
+            const bbY = offsetY + 450;
+            
+            // Head tube top position (for optimization calculation)
+            const headTubeTopX = bbX + (reach * scale);
+            const headTubeTopY = bbY - (stack * scale);
+            
+            // Saddle tip position (from seatpost + setback calculation)
+            const saddleCenterX = bbX - (saddleHeight * Math.cos(seatAngleRad) * scale) + (seatpostSetback * scale);
+            const saddleTipX = saddleCenterX + ((saddleLength / 2 + saddleRailPosition) * scale);
+            const saddleTipY = bbY - (saddleHeight * scale);
+            
+            // Target handlebar position from fit requirements
+            const horizontalDistance = Math.sqrt((saddleTipToBarCenter * saddleTipToBarCenter) - (saddleToBarHeight * saddleToBarHeight));
+            const targetBarX = saddleTipX + (horizontalDistance * scale);
+            const targetBarY = saddleTipY + (saddleToBarHeight * scale);
+            
+            // Find optimal stem configuration
+            const stemOptions = findOptimalStemConfig(headTubeTopX, headTubeTopY, headAngle, targetBarX, targetBarY, scale);
+            
+            // Use best option
+            const bestConfig = stemOptions[0];
+            const spacerHeight = bestConfig.spacers;
+            const stemLength = bestConfig.stemLength;
+            const stemAngle = bestConfig.stemAngle;
 
             // Update results with calculated values
             updateResults({
-                seatpostSetback: Math.round(seatpostSetback * 10) / 10, // Round to 1 decimal
+                seatpostSetback: Math.round(seatpostSetback * 10) / 10,
                 stemLength: stemLength,
-                spacerHeight: spacerHeight
+                spacerHeight: spacerHeight,
+                stemAngle: stemAngle,
+                stemOptions: stemOptions
             });
-
-            // Stem parameters
-            const stemAngle = -6; // Placeholder - offset from perpendicular to spacers
 
             // Draw the bike frame with actual geometry and fit data
             drawBikeDiagram({
@@ -440,8 +517,8 @@
         }
 
         function updateShoppingList(results) {
-            const shoppingList = `
-                <strong>🎯 Step 8: Proper Spacer Stack + Stem!</strong><br><br>
+            let shoppingList = `
+                <strong>🎯 OPTIMIZED STEM CONFIGURATION!</strong><br><br>
                 📏 <strong>Reach:</strong> ${document.getElementById('reach').value}mm<br>
                 📐 <strong>Stack:</strong> ${document.getElementById('stack').value}mm<br>
                 🪑 <strong>Seat Angle:</strong> ${document.getElementById('seatAngle').value}°<br>
@@ -452,11 +529,25 @@
                 📏 <strong>Saddle Length:</strong> ${document.getElementById('saddleLength').value}mm<br>
                 🎯 <strong>Target Tip-to-BB:</strong> ${document.getElementById('saddleTipToBB').value}mm<br>
                 📐 <strong>Saddle-Bar Drop:</strong> ${document.getElementById('saddleToBarHeight').value}mm<br>
-                📏 <strong>Tip-to-Bar Center:</strong> ${document.getElementById('saddleTipToBarCenter').value}mm<br>
-                🔧 <strong>Spacers:</strong> 20mm (placeholder)<br>
+                📏 <strong>Tip-to-Bar Center:</strong> ${document.getElementById('saddleTipToBarCenter').value}mm<br><br>
+                
+                <strong>🏆 OPTIMIZED COMPONENTS:</strong><br>
+                🔧 <strong>Spacers:</strong> ${results.spacerHeight}mm<br>
                 🔧 <strong>Stem Height:</strong> 40mm (constant)<br>
-                🔧 <strong>Stem Length:</strong> 90mm (placeholder)<br>
-                📐 <strong>Stem Angle:</strong> -6° from ⊥ (placeholder)<br><br>
+                🔧 <strong>Stem Length:</strong> ${results.stemLength}mm<br>
+                📐 <strong>Stem Angle:</strong> ${results.stemAngle}° from ⊥<br>
+            `;
+            
+            // Add alternative options if available
+            if (results.stemOptions && results.stemOptions.length > 1) {
+                shoppingList += `<br><strong>📋 ALTERNATIVES:</strong><br>`;
+                for (let i = 1; i < Math.min(3, results.stemOptions.length); i++) {
+                    const option = results.stemOptions[i];
+                    shoppingList += `${i + 1}. ${option.spacers}mm spacers + ${option.stemLength}mm stem + ${option.stemAngle}° (${Math.round(option.error * 10) / 10}mm error)<br>`;
+                }
+            }
+            
+            shoppingList += `<br>
                 <strong>✅ What you should see:</strong><br>
                 • Red BB center point<br>
                 • Blue head tube top point<br>
@@ -464,19 +555,16 @@
                 • Dark gray frame triangle<br>
                 • Dark seatpost (shaft + setback head)<br>
                 • Purple saddle with red tip marker<br>
-                • Teal handlebar circle (positioned by trigonometry)<br>
-                • Orange spacers (variable, extending from head tube top)<br>
+                • Teal handlebar circle (positioned by optimization)<br>
+                • Orange spacers (optimized distance)<br>
                 • Dark gray stem height (constant 40mm component)<br>
-                • Dark gray stem (90mm, -6° from perpendicular)<br>
+                • Dark gray stem (optimized length & angle)<br>
                 • Orange saddle height (straight up seatpost)<br>
                 • Red tip-to-BB (horizontal measurement)<br>
                 • Purple saddle drop measurement<br>
                 • Green tip-to-bar diagonal measurement<br>
-                • Calculated setback label<br>
-                • Spacer distance label<br>
-                • Stem height label (40mm)<br>
-                • Stem length and angle labels<br><br>
-                <em>Proper spacer stack + stem height + stem! 🚴‍♂️</em>
+                • All measurement labels<br><br>
+                <em>Components optimized for perfect fit! 🚴‍♂️</em>
             `;
             document.getElementById('shoppingList').innerHTML = shoppingList;
         }
@@ -921,19 +1009,10 @@
 
             // === HANDLEBARS ===
             
-            // Calculate handlebar position using trigonometry
-            // We know: diagonal distance (tip to bar center) and vertical distance (saddle drop)
-            // Calculate: horizontal distance using Pythagorean theorem
-            
-            const diagonalDistance = saddleTipToBarCenter; // 550mm diagonal
-            const verticalDistance = saddleToBarHeight; // 64mm drop
-            
-            // Horizontal distance = √(diagonal² - vertical²)
-            const horizontalDistance = Math.sqrt((diagonalDistance * diagonalDistance) - (verticalDistance * verticalDistance));
-            
-            // Position handlebars relative to saddle tip
-            const handlebarX = saddleTipX + (horizontalDistance * scale); // Forward from saddle tip
-            const handlebarY = saddleCenterY + (saddleToBarHeight * scale); // Drop from saddle center
+            // Handlebars are positioned at the stem end (from optimization)
+            // The stem end position was calculated to match the fit requirements exactly
+            const handlebarX = stemEndX;
+            const handlebarY = stemEndY;
             
             // 10. Draw HANDLEBARS (circle - side view)
             const handlebarCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
