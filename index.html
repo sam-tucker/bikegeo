@@ -390,10 +390,13 @@
                 spacerHeight: spacerHeight
             });
 
+            // Stem parameters
+            const stemAngle = -6; // Placeholder - offset from perpendicular to spacers
+
             // Draw the bike frame with actual geometry and fit data
             drawBikeDiagram({
                 reach, stack, headAngle, seatAngle, headTube, seatTube, bbDrop,
-                saddleHeight, saddleLength, seatpostSetback, saddleTipToBB, saddleRailPosition, saddleToBarHeight, saddleTipToBarCenter, spacerHeight
+                saddleHeight, saddleLength, seatpostSetback, saddleTipToBB, saddleRailPosition, saddleToBarHeight, saddleTipToBarCenter, spacerHeight, stemLength, stemAngle
             });
         }
 
@@ -438,7 +441,7 @@
 
         function updateShoppingList(results) {
             const shoppingList = `
-                <strong>🎯 Step 7: Spacers Added!</strong><br><br>
+                <strong>🎯 Step 8: Proper Spacer Stack + Stem!</strong><br><br>
                 📏 <strong>Reach:</strong> ${document.getElementById('reach').value}mm<br>
                 📐 <strong>Stack:</strong> ${document.getElementById('stack').value}mm<br>
                 🪑 <strong>Seat Angle:</strong> ${document.getElementById('seatAngle').value}°<br>
@@ -449,7 +452,11 @@
                 📏 <strong>Saddle Length:</strong> ${document.getElementById('saddleLength').value}mm<br>
                 🎯 <strong>Target Tip-to-BB:</strong> ${document.getElementById('saddleTipToBB').value}mm<br>
                 📐 <strong>Saddle-Bar Drop:</strong> ${document.getElementById('saddleToBarHeight').value}mm<br>
-                📏 <strong>Tip-to-Bar Center:</strong> ${document.getElementById('saddleTipToBarCenter').value}mm<br><br>
+                📏 <strong>Tip-to-Bar Center:</strong> ${document.getElementById('saddleTipToBarCenter').value}mm<br>
+                🔧 <strong>Spacers:</strong> 20mm (placeholder)<br>
+                🔧 <strong>Stem Height:</strong> 40mm (constant)<br>
+                🔧 <strong>Stem Length:</strong> 90mm (placeholder)<br>
+                📐 <strong>Stem Angle:</strong> -6° from ⊥ (placeholder)<br><br>
                 <strong>✅ What you should see:</strong><br>
                 • Red BB center point<br>
                 • Blue head tube top point<br>
@@ -458,14 +465,18 @@
                 • Dark seatpost (shaft + setback head)<br>
                 • Purple saddle with red tip marker<br>
                 • Teal handlebar circle (positioned by trigonometry)<br>
-                • Orange spacers (extending from head tube top)<br>
+                • Orange spacers (variable, extending from head tube top)<br>
+                • Dark gray stem height (constant 40mm component)<br>
+                • Dark gray stem (90mm, -6° from perpendicular)<br>
                 • Orange saddle height (straight up seatpost)<br>
                 • Red tip-to-BB (horizontal measurement)<br>
                 • Purple saddle drop measurement<br>
                 • Green tip-to-bar diagonal measurement<br>
                 • Calculated setback label<br>
-                • Spacer distance label<br><br>
-                <em>Spacers added along head tube angle! 🚴‍♂️</em>
+                • Spacer distance label<br>
+                • Stem height label (40mm)<br>
+                • Stem length and angle labels<br><br>
+                <em>Proper spacer stack + stem height + stem! 🚴‍♂️</em>
             `;
             document.getElementById('shoppingList').innerHTML = shoppingList;
         }
@@ -741,6 +752,94 @@
             spacerText.setAttribute('font-size', '12px');
             spacerText.textContent = `SPACERS: ${spacerDistance}mm`;
             svg.appendChild(spacerText);
+
+            // === STEM HEIGHT (constant 40mm component) ===
+            
+            const stemHeight = 40; // mm - constant stem body height
+            
+            // Calculate stem body top position (extending from spacer top along head tube angle)
+            const stemBodyTopX = spacerTopX - (stemHeight * scale) * Math.cos(headAngleRad);
+            const stemBodyTopY = spacerTopY - (stemHeight * scale) * Math.sin(headAngleRad);
+            
+            // Draw STEM HEIGHT (line extending from spacer top)
+            const stemHeightElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            stemHeightElement.setAttribute('x1', spacerTopX);
+            stemHeightElement.setAttribute('y1', spacerTopY);
+            stemHeightElement.setAttribute('x2', stemBodyTopX);
+            stemHeightElement.setAttribute('y2', stemBodyTopY);
+            stemHeightElement.setAttribute('stroke', '#34495e');
+            stemHeightElement.setAttribute('stroke-width', '8');
+            stemHeightElement.setAttribute('stroke-linecap', 'round');
+            svg.appendChild(stemHeightElement);
+            
+            // Mark stem body top
+            const stemBodyTopCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            stemBodyTopCircle.setAttribute('cx', stemBodyTopX);
+            stemBodyTopCircle.setAttribute('cy', stemBodyTopY);
+            stemBodyTopCircle.setAttribute('r', 4);
+            stemBodyTopCircle.setAttribute('fill', '#34495e');
+            svg.appendChild(stemBodyTopCircle);
+            
+            // Stem height label
+            const stemHeightText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            stemHeightText.setAttribute('x', (spacerTopX + stemBodyTopX) / 2 + 20);
+            stemHeightText.setAttribute('y', (spacerTopY + stemBodyTopY) / 2);
+            stemHeightText.setAttribute('class', 'measurement-text');
+            stemHeightText.setAttribute('font-size', '12px');
+            stemHeightText.textContent = `STEM HEIGHT: ${stemHeight}mm`;
+            svg.appendChild(stemHeightText);
+
+            // === STEM (forward extension) ===
+            
+            // Get stem parameters
+            const stemLength = params.stemLength || 90; // mm
+            const stemAngle = params.stemAngle || -6; // degrees, offset from perpendicular to spacers
+            
+            // Calculate stem angle: perpendicular to head tube + stem angle offset
+            // Perpendicular to head tube (forward direction): head tube angle - 90°
+            // Negative stem angle should point downwards, so we subtract the angle
+            const stemAngleRad = (headAngle - 90 - stemAngle) * (Math.PI / 180);
+            
+            // Calculate stem end position (extending from stem body top)
+            const stemEndX = stemBodyTopX + (stemLength * scale) * Math.cos(stemAngleRad);
+            const stemEndY = stemBodyTopY + (stemLength * scale) * Math.sin(stemAngleRad);
+            
+            // Draw STEM (line extending from stem body top)
+            const stemElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            stemElement.setAttribute('x1', stemBodyTopX);
+            stemElement.setAttribute('y1', stemBodyTopY);
+            stemElement.setAttribute('x2', stemEndX);
+            stemElement.setAttribute('y2', stemEndY);
+            stemElement.setAttribute('stroke', '#2c3e50');
+            stemElement.setAttribute('stroke-width', '6');
+            stemElement.setAttribute('stroke-linecap', 'round');
+            svg.appendChild(stemElement);
+            
+            // Mark stem end (where handlebars attach)
+            const stemEndCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            stemEndCircle.setAttribute('cx', stemEndX);
+            stemEndCircle.setAttribute('cy', stemEndY);
+            stemEndCircle.setAttribute('r', 4);
+            stemEndCircle.setAttribute('fill', '#2c3e50');
+            svg.appendChild(stemEndCircle);
+            
+            // Stem length label
+            const stemLengthText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            stemLengthText.setAttribute('x', (stemBodyTopX + stemEndX) / 2 + 15);
+            stemLengthText.setAttribute('y', (stemBodyTopY + stemEndY) / 2 - 5);
+            stemLengthText.setAttribute('class', 'measurement-text');
+            stemLengthText.setAttribute('font-size', '12px');
+            stemLengthText.textContent = `STEM: ${stemLength}mm`;
+            svg.appendChild(stemLengthText);
+            
+            // Stem angle label
+            const stemAngleText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            stemAngleText.setAttribute('x', (stemBodyTopX + stemEndX) / 2 + 15);
+            stemAngleText.setAttribute('y', (stemBodyTopY + stemEndY) / 2 + 10);
+            stemAngleText.setAttribute('class', 'measurement-text');
+            stemAngleText.setAttribute('font-size', '10px');
+            stemAngleText.textContent = `${stemAngle}° from ⊥`;
+            svg.appendChild(stemAngleText);
 
             // === BIKE FIT COMPONENTS ===
             
