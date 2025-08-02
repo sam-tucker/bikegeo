@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bike Fit Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            height: fit-content;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 80px;
+            gap: 10px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .form-row label {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .form-row input {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-row input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .bike-diagram {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .bike-diagram h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .results-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            height: fit-content;
+        }
+
+        .results-section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #27ae60;
+            padding-bottom: 5px;
+        }
+
+        .result-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #27ae60;
+        }
+
+        .result-item h4 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #27ae60;
+        }
+
+        .result-status {
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+
+        .validation-section {
+            background: #e8f5e8;
+            border: 1px solid #27ae60;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .validation-section h4 {
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+
+        .test-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .test-button:hover {
+            background: #2980b9;
+        }
+
+        .warning {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .success {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .measurement-line {
+            stroke: #e74c3c;
+            stroke-width: 2;
+            marker-end: url(#arrowhead);
+        }
+
+        .measurement-text {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            fill: #e74c3c;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚴‍♂️ Bike Fit Calculator</h1>
+            <p>Calculate seatpost setback, stem length/angle, and spacer height based on frame geometry and fit requirements</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Input Section -->
+            <div class="input-section">
+                <div class="input-group">
+                    <h3>Frame Geometry (mm/degrees)</h3>
+                    <div class="form-row">
+                        <label for="reach">Reach:</label>
+                        <input type="number" id="reach" step="0.1" placeholder="378">
+                    </div>
+                    <div class="form-row">
+                        <label for="stack">Stack:</label>
+                        <input type="number" id="stack" step="0.1" placeholder="580">
+                    </div>
+                    <div class="form-row">
+                        <label for="topTube">Top Tube (effective):</label>
+                        <input type="number" id="topTube" step="0.1" placeholder="548">
+                    </div>
+                    <div class="form-row">
+                        <label for="seatTube">Seat Tube C-T:</label>
+                        <input type="number" id="seatTube" step="0.1" placeholder="536">
+                    </div>
+                    <div class="form-row">
+                        <label for="headAngle">Head Angle:</label>
+                        <input type="number" id="headAngle" step="0.1" placeholder="72.25">
+                    </div>
+                    <div class="form-row">
+                        <label for="seatAngle">Seat Angle:</label>
+                        <input type="number" id="seatAngle" step="0.1" placeholder="73.75">
+                    </div>
+                    <div class="form-row">
+                        <label for="headTube">Head Tube:</label>
+                        <input type="number" id="headTube" step="0.1" placeholder="157">
+                    </div>
+                    <div class="form-row">
+                        <label for="bbDrop">BB Drop:</label>
+                        <input type="number" id="bbDrop" step="0.1" placeholder="72">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <h3>Required Bike Fit (mm)</h3>
+                    <div class="form-row">
+                        <label for="saddleHeight">Saddle Height:</label>
+                        <input type="number" id="saddleHeight" step="0.1" placeholder="760">
+                    </div>
+                    <div class="form-row">
+                        <label for="saddleTipToBB">Tip of Saddle to BB:</label>
+                        <input type="number" id="saddleTipToBB" step="0.1" placeholder="91">
+                    </div>
+                    <div class="form-row">
+                        <label for="saddleToBarHeight">Saddle to Bar Height Diff:</label>
+                        <input type="number" id="saddleToBarHeight" step="0.1" placeholder="-64">
+                    </div>
+                    <div class="form-row">
+                        <label for="saddleTipToBarCenter">Tip of Saddle to Bar Center:</label>
+                        <input type="number" id="saddleTipToBarCenter" step="0.1" placeholder="550">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <h3>Component Options</h3>
+                    <div class="form-row">
+                        <label for="saddleLength">Saddle Length:</label>
+                        <input type="number" id="saddleLength" step="0.1" value="250" placeholder="250">
+                    </div>
+                    <div class="form-row">
+                        <label for="stemAngle">Stem Angle:</label>
+                        <input type="number" id="stemAngle" step="1" value="-6" placeholder="-6">
+                    </div>
+                    <div class="form-row">
+                        <label for="saddleRailPosition">Saddle Rail Position:</label>
+                        <input type="number" id="saddleRailPosition" step="1" value="0" placeholder="0" title="mm fore(+) or aft(-) from center">
+                    </div>
+                </div>
+
+                <div class="validation-section">
+                    <h4>Test with 54T Strael</h4>
+                    <button class="test-button" onclick="loadStrael54T()">Load Test Data</button>
+                    <div id="testResults" style="margin-top: 10px;"></div>
+                </div>
+            </div>
+
+            <!-- Bike Diagram -->
+            <div class="bike-diagram">
+                <h3>Bike Geometry Visualization</h3>
+                <svg id="bikeSvg" width="600" height="400" viewBox="0 0 600 400">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c" />
+                        </marker>
+                    </defs>
+                    <!-- Bike frame will be drawn here -->
+                </svg>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section">
+                <h3>🔧 Component Recommendations</h3>
+                
+                <div class="result-item">
+                    <h4>Seatpost Setback</h4>
+                    <div class="result-value" id="seatpostSetback">-- mm</div>
+                    <div class="result-status" id="seatpostStatus">Enter measurements</div>
+                </div>
+
+                <div class="result-item">
+                    <h4>Stem Length</h4>
+                    <div class="result-value" id="stemLength">-- mm</div>
+                    <div class="result-status" id="stemStatus">Enter measurements</div>
+                </div>
+
+                <div class="result-item">
+                    <h4>Headset Spacers</h4>
+                    <div class="result-value" id="spacerHeight">-- mm</div>
+                    <div class="result-status" id="spacerStatus">Enter measurements</div>
+                </div>
+
+                <div class="result-item">
+                    <h4>Effective Top Tube</h4>
+                    <div class="result-value" id="effectiveTopTube">-- mm</div>
+                    <div class="result-status" id="topTubeStatus">Calculated reach</div>
+                </div>
+
+                <div class="input-group" style="margin-top: 30px;">
+                    <h3>📋 Shopping List</h3>
+                    <div id="shoppingList" style="background: white; padding: 15px; border-radius: 8px; margin-top: 10px;">
+                        Enter measurements to generate component list
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Bike fit calculation functions
+        function calculateBikeFit() {
+            // Get all input values
+            const reach = parseFloat(document.getElementById('reach').value) || 0;
+            const stack = parseFloat(document.getElementById('stack').value) || 0;
+            const headAngle = parseFloat(document.getElementById('headAngle').value) || 73;
+            const seatAngle = parseFloat(document.getElementById('seatAngle').value) || 73;
+            const headTube = parseFloat(document.getElementById('headTube').value) || 150;
+            const bbDrop = parseFloat(document.getElementById('bbDrop').value) || 70;
+            
+            const saddleHeight = parseFloat(document.getElementById('saddleHeight').value) || 0;
+            const saddleTipToBB = parseFloat(document.getElementById('saddleTipToBB').value) || 0;
+            const saddleToBarHeight = parseFloat(document.getElementById('saddleToBarHeight').value) || 0;
+            const saddleTipToBarCenter = parseFloat(document.getElementById('saddleTipToBarCenter').value) || 0;
+            
+            const saddleLength = parseFloat(document.getElementById('saddleLength').value) || 250;
+            const stemAngle = parseFloat(document.getElementById('stemAngle').value) || -6;
+            const saddleRailPosition = parseFloat(document.getElementById('saddleRailPosition').value) || 0;
+
+            if (!reach || !stack || !saddleHeight || !saddleTipToBB || !saddleTipToBarCenter) {
+                return; // Not enough data to calculate
+            }
+
+            // Convert angles to radians for calculations
+            const seatAngleRad = (seatAngle * Math.PI) / 180;
+            const headAngleRad = (headAngle * Math.PI) / 180;
+            const stemAngleRad = (stemAngle * Math.PI) / 180;
+
+            // === STEP 1: Calculate desired saddle position ===
+            // Saddle tip position is given as horizontal distance from BB
+            const saddleTipX = saddleTipToBB;
+            const saddleTipY = saddleHeight;
+            
+            // Calculate saddle center position (accounting for saddle length and rail position)
+            const saddleCenterX = saddleTipX - (saddleLength / 2) + saddleRailPosition;
+            const saddleCenterY = saddleHeight;
+            
+            // === STEP 2: Calculate required seatpost setback ===
+            // Where would saddle center be if seatpost followed seat tube angle exactly?
+            const seatTubeX = saddleHeight * Math.sin(seatAngleRad - Math.PI/2); // negative because seat tube leans back
+            const seatpostSetback = saddleCenterX - seatTubeX;
+            
+            // === STEP 3: Calculate desired handlebar position ===
+            const barX = saddleTipX + saddleTipToBarCenter;
+            const barY = saddleHeight + saddleToBarHeight;
+            
+            // === STEP 4: Calculate stem requirements ===
+            // Head tube top is at (reach, stack) relative to BB
+            const headTubeTopX = reach;
+            const headTubeTopY = stack;
+            
+            // We need to find spacer height and stem length that gets us to (barX, barY)
+            // Start with a reasonable spacer height and calculate resulting stem length
+            let spacerHeight = 20; // Start with 20mm spacers
+            let stemLength;
+            
+            // Try different spacer heights to find reasonable stem length
+            for (let testSpacers = 0; testSpacers <= 50; testSpacers += 5) {
+                // Stem mount point (head tube top + spacers)
+                const stemMountX = headTubeTopX;
+                const stemMountY = headTubeTopY + testSpacers;
+                
+                // Vector from stem mount to desired bar position
+                const deltaX = barX - stemMountX;
+                const deltaY = barY - stemMountY;
+                
+                // Calculate required stem length for this spacer height
+                const testStemLength = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                
+                // Calculate what stem angle this would create
+                const actualStemAngle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+                
+                // Check if this is close to our desired angle (within 3 degrees)
+                if (Math.abs(actualStemAngle - stemAngle) < 3 && testStemLength >= 70 && testStemLength <= 140) {
+                    spacerHeight = testSpacers;
+                    stemLength = testStemLength;
+                    break;
+                }
+            }
+            
+            // If no good solution found, calculate directly
+            if (!stemLength || stemLength < 70 || stemLength > 140) {
+                // Direct calculation: solve for spacer height that gives reasonable stem length
+                // Assume stem length of 100mm and work backwards
+                const assumedStemLength = 100;
+                const stemHorizontal = assumedStemLength * Math.cos(stemAngleRad);
+                const stemVertical = assumedStemLength * Math.sin(stemAngleRad);
+                
+                spacerHeight = Math.max(0, barY - headTubeTopY - stemVertical);
+                stemLength = assumedStemLength;
+                
+                // Recalculate with actual spacer height
+                const stemMountY = headTubeTopY + spacerHeight;
+                const deltaX = barX - headTubeTopX;
+                const deltaY = barY - stemMountY;
+                stemLength = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            }
+            
+            // === STEP 5: Calculate effective top tube ===
+            const effectiveTopTube = reach + (stemLength * Math.cos(stemAngleRad));
+
+            // Update results
+            updateResults({
+                seatpostSetback: Math.round(seatpostSetback * 10) / 10,
+                stemLength: Math.round(stemLength * 10) / 10,
+                spacerHeight: Math.round(spacerHeight * 10) / 10,
+                effectiveTopTube: Math.round(effectiveTopTube * 10) / 10
+            });
+
+            // Update bike diagram
+            drawBikeDiagram({
+                reach, stack, headAngle, seatAngle, headTube, bbDrop,
+                saddleHeight, seatpostSetback, stemLength, spacerHeight,
+                barX, barY, saddleX: saddleCenterX, saddleY: saddleCenterY
+            });
+        }
+
+        function updateResults(results) {
+            // Seatpost setback
+            document.getElementById('seatpostSetback').textContent = results.seatpostSetback + ' mm';
+            const seatpostStatus = document.getElementById('seatpostStatus');
+            if (results.seatpostSetback < 20) {
+                seatpostStatus.innerHTML = '<span class="warning">⚠️ Below recommended range (20-30mm)</span>';
+            } else if (results.seatpostSetback > 30) {
+                seatpostStatus.innerHTML = '<span class="warning">⚠️ Above recommended range (20-30mm)</span>';
+            } else {
+                seatpostStatus.innerHTML = '<span class="success">✅ Within recommended range</span>';
+            }
+
+            // Stem length
+            document.getElementById('stemLength').textContent = Math.round(results.stemLength) + ' mm';
+            const stemStatus = document.getElementById('stemStatus');
+            const stemLengthRounded = Math.round(results.stemLength);
+            if (stemLengthRounded < 80) {
+                stemStatus.innerHTML = '<span class="warning">⚠️ Below recommended range (80-110mm)</span>';
+            } else if (stemLengthRounded > 110) {
+                stemStatus.innerHTML = '<span class="warning">⚠️ Above recommended range (80-110mm)</span>';
+            } else {
+                stemStatus.innerHTML = '<span class="success">✅ Within recommended range</span>';
+            }
+
+            // Spacer height
+            document.getElementById('spacerHeight').textContent = results.spacerHeight + ' mm';
+            const spacerStatus = document.getElementById('spacerStatus');
+            if (results.spacerHeight > 40) {
+                spacerStatus.innerHTML = '<span class="warning">⚠️ Above maximum (40mm)</span>';
+            } else {
+                spacerStatus.innerHTML = '<span class="success">✅ Within limits</span>';
+            }
+
+            // Effective top tube
+            document.getElementById('effectiveTopTube').textContent = results.effectiveTopTube + ' mm';
+
+            // Update shopping list
+            updateShoppingList(results);
+        }
+
+        function updateShoppingList(results) {
+            const seatpostType = results.seatpostSetback >= 20 ? 'Layback seatpost' : 'Straight seatpost with setback saddle clamp';
+            const stemLengthRounded = Math.round(results.stemLength / 10) * 10; // Round to nearest 10mm
+            
+            const shoppingList = `
+                <strong>🛒 Recommended Components:</strong><br><br>
+                📏 <strong>Stem:</strong> ${stemLengthRounded}mm, ${document.getElementById('stemAngle').value}° angle<br>
+                🪑 <strong>Seatpost:</strong> ${seatpostType} (${results.seatpostSetback.toFixed(1)}mm setback)<br>
+                📏 <strong>Spacers:</strong> ${results.spacerHeight.toFixed(1)}mm stack height<br>
+                📐 <strong>Effective reach:</strong> ${results.effectiveTopTube.toFixed(1)}mm
+            `;
+            document.getElementById('shoppingList').innerHTML = shoppingList;
+        }
+
+        function drawBikeDiagram(params) {
+            const svg = document.getElementById('bikeSvg');
+            const scale = 0.6; // Scale factor for diagram
+            const offsetX = 50;
+            const offsetY = 50;
+            
+            // Clear previous drawing
+            svg.innerHTML = svg.querySelector('defs').outerHTML;
+
+            // Calculate positions (scaled and offset)
+            const bbX = offsetX + 200;
+            const bbY = offsetY + 250;
+            const seatX = bbX + (params.saddleX * scale);
+            const seatY = bbY - (params.saddleHeight * scale);
+            const barX = bbX + (params.barX * scale);
+            const barY = bbY - ((params.barY - params.bbDrop) * scale);
+            const headTubeTopX = bbX + (params.reach * scale);
+            const headTubeTopY = bbY - (params.stack * scale);
+
+            // Draw bike frame
+            const frameGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            frameGroup.setAttribute('stroke', '#2c3e50');
+            frameGroup.setAttribute('stroke-width', '3');
+            frameGroup.setAttribute('fill', 'none');
+
+            // Wheels
+            const rearWheel = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            rearWheel.setAttribute('cx', bbX - 50);
+            rearWheel.setAttribute('cy', bbY);
+            rearWheel.setAttribute('r', 60);
+            frameGroup.appendChild(rearWheel);
+
+            const frontWheel = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            frontWheel.setAttribute('cx', bbX + 400);
+            frontWheel.setAttribute('cy', bbY);
+            frontWheel.setAttribute('r', 60);
+            frameGroup.appendChild(frontWheel);
+
+            // Frame tubes
+            // Seat tube
+            const seatTube = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            seatTube.setAttribute('x1', bbX);
+            seatTube.setAttribute('y1', bbY);
+            seatTube.setAttribute('x2', seatX);
+            seatTube.setAttribute('y2', seatY + 50);
+            frameGroup.appendChild(seatTube);
+
+            // Top tube
+            const topTube = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            topTube.setAttribute('x1', seatX);
+            topTube.setAttribute('y1', seatY + 50);
+            topTube.setAttribute('x2', headTubeTopX);
+            topTube.setAttribute('y2', headTubeTopY);
+            frameGroup.appendChild(topTube);
+
+            // Head tube
+            const headTube = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            headTube.setAttribute('x1', headTubeTopX);
+            headTube.setAttribute('y1', headTubeTopY);
+            headTube.setAttribute('x2', headTubeTopX + 20);
+            headTube.setAttribute('y2', headTubeTopY + (params.headTube * scale));
+            frameGroup.appendChild(headTube);
+
+            // Down tube
+            const downTube = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            downTube.setAttribute('x1', bbX);
+            downTube.setAttribute('y1', bbY);
+            downTube.setAttribute('x2', headTubeTopX + 20);
+            downTube.setAttribute('y2', headTubeTopY + (params.headTube * scale));
+            frameGroup.appendChild(downTube);
+
+            // Stem
+            const stem = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            stem.setAttribute('x1', headTubeTopX);
+            stem.setAttribute('y1', headTubeTopY + (params.spacerHeight * scale));
+            stem.setAttribute('x2', barX);
+            stem.setAttribute('y2', barY);
+            stem.setAttribute('stroke', '#e74c3c');
+            stem.setAttribute('stroke-width', '4');
+            frameGroup.appendChild(stem);
+
+            // Saddle
+            const saddle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            saddle.setAttribute('x', seatX - 40);
+            saddle.setAttribute('y', seatY - 5);
+            saddle.setAttribute('width', 80);
+            saddle.setAttribute('height', 10);
+            saddle.setAttribute('fill', '#2c3e50');
+            frameGroup.appendChild(saddle);
+
+            // Handlebar
+            const handlebar = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            handlebar.setAttribute('cx', barX);
+            handlebar.setAttribute('cy', barY);
+            handlebar.setAttribute('r', 8);
+            handlebar.setAttribute('fill', '#e74c3c');
+            frameGroup.appendChild(handlebar);
+
+            svg.appendChild(frameGroup);
+
+            // Add measurement annotations
+            addMeasurementLine(svg, bbX, bbY, seatX, seatY, 'Saddle Height', offsetX - 40);
+            addMeasurementLine(svg, headTubeTopX, headTubeTopY, barX, barY, `Stem: ${Math.round(params.stemLength)}mm`, headTubeTopX + 50);
+            addMeasurementLine(svg, headTubeTopX, headTubeTopY, headTubeTopX, headTubeTopY + (params.spacerHeight * scale), `Spacers: ${params.spacerHeight.toFixed(1)}mm`, headTubeTopX + 70);
+        }
+
+        function addMeasurementLine(svg, x1, y1, x2, y2, label, textX) {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+            line.setAttribute('class', 'measurement-line');
+            svg.appendChild(line);
+
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', textX || (x1 + x2) / 2);
+            text.setAttribute('y', (y1 + y2) / 2 - 5);
+            text.setAttribute('class', 'measurement-text');
+            text.textContent = label;
+            svg.appendChild(text);
+        }
+
+        // Load test data for 54T Strael
+        function loadStrael54T() {
+            // Frame geometry
+            document.getElementById('reach').value = 378;
+            document.getElementById('stack').value = 580;
+            document.getElementById('topTube').value = 548;
+            document.getElementById('seatTube').value = 536;
+            document.getElementById('headAngle').value = 72.25;
+            document.getElementById('seatAngle').value = 73.75;
+            document.getElementById('headTube').value = 157;
+            document.getElementById('bbDrop').value = 72;
+
+            // Bike fit (optimal values)
+            document.getElementById('saddleHeight').value = 760;
+            document.getElementById('saddleTipToBB').value = 91;
+            document.getElementById('saddleToBarHeight').value = -64;
+            document.getElementById('saddleTipToBarCenter').value = 550;
+
+            // Calculate and show test results
+            calculateBikeFit();
+            
+            const stemResult = parseFloat(document.getElementById('stemLength').textContent);
+            const seatpostResult = parseFloat(document.getElementById('seatpostSetback').textContent);
+            
+            let testMessage = `Test Results:<br>`;
+            testMessage += `Stem: ${Math.round(stemResult)}mm (Target: ~90mm) `;
+            testMessage += Math.abs(stemResult - 90) < 15 ? '<span class="success">✅</span>' : '<span class="warning">❌</span>';
+            testMessage += `<br>Seatpost: ${seatpostResult.toFixed(1)}mm (Target: ~25mm) `;
+            testMessage += Math.abs(seatpostResult - 25) < 10 ? '<span class="success">✅</span>' : '<span class="warning">❌</span>';
+            
+            document.getElementById('testResults').innerHTML = testMessage;
+        }
+
+        // Add event listeners to all inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input[type="number"]');
+            inputs.forEach(input => {
+                input.addEventListener('input', calculateBikeFit);
+            });
+        });
+    </script>
+</body>
+</html>
