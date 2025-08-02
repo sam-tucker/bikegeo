@@ -346,6 +346,7 @@
             const headAngle = parseFloat(document.getElementById('headAngle').value) || 72.25;
             const seatAngle = parseFloat(document.getElementById('seatAngle').value) || 73.75;
             const headTube = parseFloat(document.getElementById('headTube').value) || 157;
+            const seatTube = parseFloat(document.getElementById('seatTube').value) || 536;
             const bbDrop = 72; // Fixed value since not needed for bike fit calculations
             
             // For now, just show placeholder values for calculations
@@ -363,7 +364,7 @@
 
             // Draw the bike frame with actual geometry
             drawBikeDiagram({
-                reach, stack, headAngle, seatAngle, headTube, bbDrop
+                reach, stack, headAngle, seatAngle, headTube, seatTube, bbDrop
             });
         }
 
