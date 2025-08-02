@@ -46,7 +46,7 @@
 
         .main-content {
             display: grid;
-            grid-template-columns: 1fr 2fr 1fr;
+            grid-template-columns: 1fr 3fr 1fr;
             gap: 30px;
             padding: 30px;
         }
@@ -301,7 +301,7 @@
             <!-- Bike Diagram -->
             <div class="bike-diagram">
                 <h3>Bike Geometry Visualization</h3>
-                <svg id="bikeSvg" width="600" height="400" viewBox="0 0 600 400">
+                <svg id="bikeSvg" width="800" height="600" viewBox="0 0 800 600">
                     <defs>
                         <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
                             <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" />
@@ -423,41 +423,55 @@
 
         function updateShoppingList(results) {
             const shoppingList = `
-                <strong>🎯 Step 1: Basic Geometry</strong><br><br>
+                <strong>🎯 Step 2: Seat Tube Added</strong><br><br>
                 📏 <strong>Reach:</strong> ${document.getElementById('reach').value}mm<br>
-                📐 <strong>Stack:</strong> ${document.getElementById('stack').value}mm<br><br>
+                📐 <strong>Stack:</strong> ${document.getElementById('stack').value}mm<br>
+                🪑 <strong>Seat Angle:</strong> ${document.getElementById('seatAngle').value}°<br>
+                📏 <strong>Seat Tube C-T:</strong> ${document.getElementById('seatTube').value}mm<br><br>
                 <strong>✅ What you should see:</strong><br>
                 • Red BB center point<br>
                 • Blue head tube top point<br>
-                • Horizontal red line (reach)<br>
-                • Vertical blue line (stack)<br><br>
-                <em>Once this looks correct, we'll add Step 2...</em>
+                • Red reach line (horizontal)<br>
+                • Blue stack line (vertical)<br>
+                • Dark gray seat tube (from BB)<br>
+                • Orange seat tube measurement<br>
+                • Orange C-T measurement point<br><br>
+                <em>This makes more sense - seat tube connects to BB!</em>
             `;
             document.getElementById('shoppingList').innerHTML = shoppingList;
         }
 
         function drawBikeDiagram(params) {
             const svg = document.getElementById('bikeSvg');
-            const scale = 0.8; // Larger scale for better visibility
-            const offsetX = 50;
-            const offsetY = 50;
+            const scale = 0.6; // Adjusted scale to fit better
+            const offsetX = 100;
+            const offsetY = 100;
             
             // Clear previous drawing
             svg.innerHTML = svg.querySelector('defs').outerHTML;
 
-            // Bottom bracket is our origin point
-            const bbX = offsetX + 150;
-            const bbY = offsetY + 300;
+            // Bottom bracket is our origin point - positioned to allow space for measurements
+            const bbX = offsetX + 200;
+            const bbY = offsetY + 450; // More space above for stack measurement
 
             // Frame geometry values
             const reach = params.reach || 378;
             const stack = params.stack || 580;
+            const seatAngle = params.seatAngle || 73.75;
+            const seatTube = params.seatTube || 536;
 
-            // Head tube top position (scaled)
+            // Head tube top position (scaled) - still needed for measurements
             const headTubeTopX = bbX + (reach * scale);
             const headTubeTopY = bbY - (stack * scale);
 
-            // === STEP 1: ONLY BB, STACK, and REACH ===
+            // Calculate seat tube top position
+            // Seat angle is measured from horizontal, seat tube leans back slightly  
+            const seatAngleRad = (seatAngle * Math.PI) / 180;
+            const seatTubeCTLength = seatTube * scale; // Use actual C-T measurement scaled
+            const seatTubeTopX = bbX - (seatTubeCTLength) * Math.cos(seatAngleRad);
+            const seatTubeTopY = bbY - (seatTubeCTLength) * Math.sin(seatAngleRad);
+
+            // === STEP 2: BB, STACK, REACH + SEAT TUBE ===
             
             // 1. Draw Bottom Bracket (origin point)
             const bbCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -479,50 +493,109 @@
             headTubeTopCircle.setAttribute('stroke-width', '1');
             svg.appendChild(headTubeTopCircle);
 
-            // 3. Draw REACH measurement (horizontal)
+            // 3. Draw REACH measurement (horizontal) - OVERLAID on actual measurement
             const reachLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             reachLine.setAttribute('x1', bbX);
-            reachLine.setAttribute('y1', bbY + 40); // Offset below BB
+            reachLine.setAttribute('y1', bbY); // Direct from BB center
             reachLine.setAttribute('x2', headTubeTopX);
-            reachLine.setAttribute('y2', bbY + 40);
+            reachLine.setAttribute('y2', bbY); // Horizontal line at BB level
             reachLine.setAttribute('stroke', '#e74c3c');
-            reachLine.setAttribute('stroke-width', '2');
-            reachLine.setAttribute('marker-start', 'url(#arrowhead)');
-            reachLine.setAttribute('marker-end', 'url(#arrowhead)');
+            reachLine.setAttribute('stroke-width', '3');
+            reachLine.setAttribute('stroke-dasharray', '5,5'); // Dashed line
             svg.appendChild(reachLine);
 
-            // REACH label
+            // REACH label - positioned above the line
             const reachText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             reachText.setAttribute('x', (bbX + headTubeTopX) / 2);
-            reachText.setAttribute('y', bbY + 60);
+            reachText.setAttribute('y', bbY - 10);
             reachText.setAttribute('text-anchor', 'middle');
             reachText.setAttribute('class', 'measurement-text');
+            reachText.setAttribute('font-weight', 'bold');
             reachText.textContent = `REACH: ${reach}mm`;
             svg.appendChild(reachText);
 
-            // 4. Draw STACK measurement (vertical)
+            // 4. Draw STACK measurement (vertical) - OVERLAID on actual measurement
             const stackLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            stackLine.setAttribute('x1', bbX - 40); // Offset left of BB
+            stackLine.setAttribute('x1', bbX); // Direct from BB center
             stackLine.setAttribute('y1', bbY);
-            stackLine.setAttribute('x2', bbX - 40);
+            stackLine.setAttribute('x2', bbX); // Vertical line at BB X position
             stackLine.setAttribute('y2', headTubeTopY);
             stackLine.setAttribute('stroke', '#3498db');
-            stackLine.setAttribute('stroke-width', '2');
-            stackLine.setAttribute('marker-start', 'url(#arrowhead)');
-            stackLine.setAttribute('marker-end', 'url(#arrowhead)');
+            stackLine.setAttribute('stroke-width', '3');
+            stackLine.setAttribute('stroke-dasharray', '5,5'); // Dashed line
             svg.appendChild(stackLine);
 
-            // STACK label
+            // STACK label - positioned beside the line
             const stackText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            stackText.setAttribute('x', bbX - 65);
+            stackText.setAttribute('x', bbX + 15);
             stackText.setAttribute('y', (bbY + headTubeTopY) / 2);
-            stackText.setAttribute('text-anchor', 'middle');
+            stackText.setAttribute('text-anchor', 'start');
             stackText.setAttribute('class', 'measurement-text');
-            stackText.setAttribute('transform', `rotate(-90, ${bbX - 65}, ${(bbY + headTubeTopY) / 2})`);
+            stackText.setAttribute('font-weight', 'bold');
+            stackText.setAttribute('transform', `rotate(-90, ${bbX + 15}, ${(bbY + headTubeTopY) / 2})`);
             stackText.textContent = `STACK: ${stack}mm`;
             svg.appendChild(stackText);
 
-            // 5. Add labels for the points
+            // 5. Draw SEAT TUBE (connects directly to BB)
+            const seatTubeElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            seatTubeElement.setAttribute('x1', bbX);
+            seatTubeElement.setAttribute('y1', bbY);
+            seatTubeElement.setAttribute('x2', seatTubeTopX);
+            seatTubeElement.setAttribute('y2', seatTubeTopY);
+            seatTubeElement.setAttribute('stroke', '#34495e');
+            seatTubeElement.setAttribute('stroke-width', '6');
+            seatTubeElement.setAttribute('stroke-linecap', 'round');
+            svg.appendChild(seatTubeElement);
+
+            // Seat tube angle measurement line
+            const seatTubeAngleLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            seatTubeAngleLine.setAttribute('x1', bbX);
+            seatTubeAngleLine.setAttribute('y1', bbY);
+            seatTubeAngleLine.setAttribute('x2', seatTubeTopX);
+            seatTubeAngleLine.setAttribute('y2', seatTubeTopY);
+            seatTubeAngleLine.setAttribute('stroke', '#e67e22');
+            seatTubeAngleLine.setAttribute('stroke-width', '2');
+            seatTubeAngleLine.setAttribute('stroke-dasharray', '3,3');
+            svg.appendChild(seatTubeAngleLine);
+
+            // Mark the C-T point (same as seat tube end)
+            const seatTubeCTPoint = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            seatTubeCTPoint.setAttribute('cx', seatTubeTopX);
+            seatTubeCTPoint.setAttribute('cy', seatTubeTopY);
+            seatTubeCTPoint.setAttribute('r', 3);
+            seatTubeCTPoint.setAttribute('fill', '#e67e22');
+            svg.appendChild(seatTubeCTPoint);
+
+            // Seat tube C-T measurement line (same as seat tube)
+            const seatTubeCTMeasureLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            seatTubeCTMeasureLine.setAttribute('x1', bbX);
+            seatTubeCTMeasureLine.setAttribute('y1', bbY);
+            seatTubeCTMeasureLine.setAttribute('x2', seatTubeTopX);
+            seatTubeCTMeasureLine.setAttribute('y2', seatTubeTopY);
+            seatTubeCTMeasureLine.setAttribute('stroke', '#e67e22');
+            seatTubeCTMeasureLine.setAttribute('stroke-width', '3');
+            seatTubeCTMeasureLine.setAttribute('stroke-dasharray', '5,5');
+            svg.appendChild(seatTubeCTMeasureLine);
+
+            // Seat tube C-T label
+            const seatTubeCTText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            seatTubeCTText.setAttribute('x', seatTubeTopX - 60);
+            seatTubeCTText.setAttribute('y', (bbY + seatTubeTopY) / 2);
+            seatTubeCTText.setAttribute('class', 'measurement-text');
+            seatTubeCTText.setAttribute('font-weight', 'bold');
+            seatTubeCTText.textContent = `SEAT TUBE C-T: ${seatTube}mm`;
+            svg.appendChild(seatTubeCTText);
+
+            // Seat angle label
+            const seatAngleText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            seatAngleText.setAttribute('x', bbX - 80);
+            seatAngleText.setAttribute('y', bbY - 20);
+            seatAngleText.setAttribute('class', 'measurement-text');
+            seatAngleText.setAttribute('font-size', '12px');
+            seatAngleText.textContent = `SEAT ANGLE: ${seatAngle}°`;
+            svg.appendChild(seatAngleText);
+
+            // 6. Add labels for the points
             const bbLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             bbLabel.setAttribute('x', bbX);
             bbLabel.setAttribute('y', bbY + 25);
