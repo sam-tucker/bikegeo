@@ -349,22 +349,49 @@
             const seatTube = parseFloat(document.getElementById('seatTube').value) || 536;
             const bbDrop = 72; // Fixed value since not needed for bike fit calculations
             
-            // For now, just show placeholder values for calculations
-            // We'll focus on getting the frame geometry right first
-            const seatpostSetback = 25; // Placeholder
+            // Get bike fit values
+            const saddleHeight = parseFloat(document.getElementById('saddleHeight').value) || 760;
+            const saddleLength = parseFloat(document.getElementById('saddleLength').value) || 250;
+            const saddleTipToBB = parseFloat(document.getElementById('saddleTipToBB').value) || 91;
+            const saddleRailPosition = parseFloat(document.getElementById('saddleRailPosition').value) || 0;
+            
+            // === SEATPOST SETBACK CALCULATION ===
+            // Calculate required seatpost setback to achieve target tip-to-BB distance
+            
+            // Convert angles to radians
+            const seatAngleRad = (seatAngle * Math.PI) / 180;
+            
+            // Calculate seatpost top position (no setback yet)
+            const seatpostTopX_noSetback = -saddleHeight * Math.cos(seatAngleRad); // Relative to BB
+            const seatpostTopY_noSetback = -saddleHeight * Math.sin(seatAngleRad); // Relative to BB
+            
+            // Calculate saddle tip position with no setback (tip is forward of attachment point)
+            const saddleTipX_noSetback = seatpostTopX_noSetback + (saddleLength / 2) + saddleRailPosition;
+            
+            // Calculate current HORIZONTAL tip-to-BB distance (matching visualization)
+            const currentHorizontalTipToBB = Math.abs(saddleTipX_noSetback);
+            
+            // Calculate setback needed (setback moves saddle backwards horizontally)
+            // Positive setback reduces the horizontal distance to BB
+            const requiredSetback = currentHorizontalTipToBB - saddleTipToBB;
+            
+            // Constrain setback to reasonable range (0-30mm)
+            const seatpostSetback = Math.max(0, Math.min(30, requiredSetback));
+            
             const stemLength = 90; // Placeholder  
             const spacerHeight = 20; // Placeholder
 
-            // Update results with placeholder values
+            // Update results with calculated values
             updateResults({
-                seatpostSetback: seatpostSetback,
+                seatpostSetback: Math.round(seatpostSetback * 10) / 10, // Round to 1 decimal
                 stemLength: stemLength,
                 spacerHeight: spacerHeight
             });
 
-            // Draw the bike frame with actual geometry
+            // Draw the bike frame with actual geometry and fit data
             drawBikeDiagram({
-                reach, stack, headAngle, seatAngle, headTube, seatTube, bbDrop
+                reach, stack, headAngle, seatAngle, headTube, seatTube, bbDrop,
+                saddleHeight, saddleLength, seatpostSetback, saddleTipToBB, saddleRailPosition
             });
         }
 
@@ -409,24 +436,27 @@
 
         function updateShoppingList(results) {
             const shoppingList = `
-                <strong>🎯 Step 4: Core Frame Geometry!</strong><br><br>
+                <strong>🎯 Step 5: Seatpost Setback Calculation!</strong><br><br>
                 📏 <strong>Reach:</strong> ${document.getElementById('reach').value}mm<br>
                 📐 <strong>Stack:</strong> ${document.getElementById('stack').value}mm<br>
                 🪑 <strong>Seat Angle:</strong> ${document.getElementById('seatAngle').value}°<br>
                 📏 <strong>Seat Tube C-T:</strong> ${document.getElementById('seatTube').value}mm<br>
                 🔧 <strong>Head Angle:</strong> ${document.getElementById('headAngle').value}°<br>
-                📏 <strong>Head Tube:</strong> ${document.getElementById('headTube').value}mm<br><br>
+                📏 <strong>Head Tube:</strong> ${document.getElementById('headTube').value}mm<br>
+                🏍️ <strong>Saddle Height:</strong> ${document.getElementById('saddleHeight').value}mm<br>
+                📏 <strong>Saddle Length:</strong> ${document.getElementById('saddleLength').value}mm<br>
+                🎯 <strong>Target Tip-to-BB:</strong> ${document.getElementById('saddleTipToBB').value}mm<br><br>
                 <strong>✅ What you should see:</strong><br>
                 • Red BB center point<br>
                 • Blue head tube top point<br>
-                • Red reach line (horizontal)<br>
-                • Blue stack line (vertical)<br>
-                • Dark gray seat tube (from BB)<br>
-                • Orange seat tube measurement<br>
-                • Dark gray head tube (angled)<br>
-                • Purple head tube measurement<br>
-                • Dark gray top tube (visual connection)<br><br>
-                <em>Ready for bike fit calculations! 🚴‍♂️</em>
+                • Red reach & blue stack lines<br>
+                • Dark gray frame triangle<br>
+                • Dark seatpost (shaft + setback head)<br>
+                • Purple saddle with red tip marker<br>
+                • Orange saddle height (straight up seatpost)<br>
+                • Red tip-to-BB (horizontal measurement)<br>
+                • Calculated setback label<br><br>
+                <em>Seatpost setback optimized for fit! 🎯</em>
             `;
             document.getElementById('shoppingList').innerHTML = shoppingList;
         }
@@ -470,7 +500,7 @@
             const headTubeBottomX = headTubeTopX + (headTube * scale) * Math.cos(headAngleRad);
             const headTubeBottomY = headTubeTopY + (headTube * scale) * Math.sin(headAngleRad);
 
-            // === STEP 4: BB, STACK, REACH + SEAT TUBE + HEAD TUBE + TOP TUBE ===
+            // === STEP 5: BB, STACK, REACH + SEAT TUBE + HEAD TUBE + TOP TUBE + SEATPOST + SADDLE ===
             
             // 1. Draw Bottom Bracket (origin point)
             const bbCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -665,6 +695,135 @@
             headLabel.setAttribute('font-size', '12px');
             headLabel.textContent = 'HEAD TUBE TOP';
             svg.appendChild(headLabel);
+
+            // === BIKE FIT COMPONENTS ===
+            
+            // Get bike fit parameters
+            const saddleHeight = params.saddleHeight || 760;
+            const saddleLength = params.saddleLength || 250;
+            const seatpostSetback = params.seatpostSetback || 25;
+            const saddleTipToBB = params.saddleTipToBB || 91;
+            const saddleRailPosition = params.saddleRailPosition || 0;
+            
+            // Calculate seatpost length: saddleHeight - seatTube
+            const seatpostLength = saddleHeight - seatTube;
+            
+            // Calculate seatpost shaft top position (along seat tube, no setback yet)
+            const seatpostShaftTopX = bbX - ((seatTube + seatpostLength) * scale) * Math.cos(seatAngleRad);
+            const seatpostShaftTopY = bbY - ((seatTube + seatpostLength) * scale) * Math.sin(seatAngleRad);
+            
+            // Calculate seatpost head position (with setback - perpendicular to seat tube)
+            const setbackX = -(seatpostSetback * scale) * Math.sin(seatAngleRad); // Perpendicular to seat tube
+            const setbackY = -(seatpostSetback * scale) * Math.cos(seatAngleRad); // Perpendicular to seat tube
+            const seatpostHeadX = seatpostShaftTopX + setbackX;
+            const seatpostHeadY = seatpostShaftTopY + setbackY;
+
+            // 8. Draw SEATPOST SHAFT (from seat tube top to seatpost shaft top)
+            const seatpostShaftElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            seatpostShaftElement.setAttribute('x1', seatTubeTopX);
+            seatpostShaftElement.setAttribute('y1', seatTubeTopY);
+            seatpostShaftElement.setAttribute('x2', seatpostShaftTopX);
+            seatpostShaftElement.setAttribute('y2', seatpostShaftTopY);
+            seatpostShaftElement.setAttribute('stroke', '#2c3e50');
+            seatpostShaftElement.setAttribute('stroke-width', '4');
+            seatpostShaftElement.setAttribute('stroke-linecap', 'round');
+            svg.appendChild(seatpostShaftElement);
+
+            // 8b. Draw SEATPOST HEAD (setback portion)
+            const seatpostHeadElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            seatpostHeadElement.setAttribute('x1', seatpostShaftTopX);
+            seatpostHeadElement.setAttribute('y1', seatpostShaftTopY);
+            seatpostHeadElement.setAttribute('x2', seatpostHeadX);
+            seatpostHeadElement.setAttribute('y2', seatpostHeadY);
+            seatpostHeadElement.setAttribute('stroke', '#2c3e50');
+            seatpostHeadElement.setAttribute('stroke-width', '4');
+            seatpostHeadElement.setAttribute('stroke-linecap', 'round');
+            svg.appendChild(seatpostHeadElement);
+
+            // 9. Draw SADDLE (horizontal line with rail adjustment)
+            const saddleLengthScaled = (saddleLength * scale) / 2; // Half length for centering
+            const saddleRailAdjustment = saddleRailPosition * scale; // Fore/aft adjustment on rails
+            
+            // Saddle position (centered on seatpost head + rail adjustment)
+            const saddleCenterX = seatpostHeadX + saddleRailAdjustment;
+            const saddleCenterY = seatpostHeadY;
+            
+            const saddleLeftX = saddleCenterX - saddleLengthScaled;
+            const saddleRightX = saddleCenterX + saddleLengthScaled;
+            
+            const saddleElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            saddleElement.setAttribute('x1', saddleLeftX);
+            saddleElement.setAttribute('y1', saddleCenterY);
+            saddleElement.setAttribute('x2', saddleRightX);
+            saddleElement.setAttribute('y2', saddleCenterY);
+            saddleElement.setAttribute('stroke', '#8e44ad');
+            saddleElement.setAttribute('stroke-width', '6');
+            saddleElement.setAttribute('stroke-linecap', 'round');
+            svg.appendChild(saddleElement);
+            
+            // Mark saddle tip (nose)
+            const saddleTipX = saddleRightX; // Right end is the tip/nose
+            const saddleTipY = saddleCenterY;
+            
+            const saddleTipCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            saddleTipCircle.setAttribute('cx', saddleTipX);
+            saddleTipCircle.setAttribute('cy', saddleTipY);
+            saddleTipCircle.setAttribute('r', 3);
+            saddleTipCircle.setAttribute('fill', '#e74c3c');
+            svg.appendChild(saddleTipCircle);
+
+            // Saddle height measurement (BB to saddle level, straight up seatpost shaft)
+            const saddleHeightLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            saddleHeightLine.setAttribute('x1', bbX);
+            saddleHeightLine.setAttribute('y1', bbY);
+            saddleHeightLine.setAttribute('x2', bbX - (saddleHeight * scale) * Math.cos(seatAngleRad));
+            saddleHeightLine.setAttribute('y2', bbY - (saddleHeight * scale) * Math.sin(seatAngleRad));
+            saddleHeightLine.setAttribute('stroke', '#f39c12');
+            saddleHeightLine.setAttribute('stroke-width', '2');
+            saddleHeightLine.setAttribute('stroke-dasharray', '4,4');
+            svg.appendChild(saddleHeightLine);
+
+            // Tip to BB measurement (HORIZONTAL measurement) - THE KEY MEASUREMENT
+            const tipToBBLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            tipToBBLine.setAttribute('x1', bbX);
+            tipToBBLine.setAttribute('y1', bbY);
+            tipToBBLine.setAttribute('x2', saddleTipX);
+            tipToBBLine.setAttribute('y2', bbY); // Same Y level as BB (horizontal line)
+            tipToBBLine.setAttribute('stroke', '#e74c3c');
+            tipToBBLine.setAttribute('stroke-width', '3');
+            tipToBBLine.setAttribute('stroke-dasharray', '6,6');
+            svg.appendChild(tipToBBLine);
+
+            // Saddle height label (positioned along seatpost shaft line)
+            const saddleHeightEndX = bbX - (saddleHeight * scale) * Math.cos(seatAngleRad);
+            const saddleHeightEndY = bbY - (saddleHeight * scale) * Math.sin(seatAngleRad);
+            const saddleHeightText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            saddleHeightText.setAttribute('x', (bbX + saddleHeightEndX) / 2 - 40);
+            saddleHeightText.setAttribute('y', (bbY + saddleHeightEndY) / 2);
+            saddleHeightText.setAttribute('class', 'measurement-text');
+            saddleHeightText.setAttribute('font-weight', 'bold');
+            saddleHeightText.textContent = `SADDLE HEIGHT: ${saddleHeight}mm`;
+            svg.appendChild(saddleHeightText);
+
+            // Tip-to-BB measurement label (positioned along horizontal line)
+            const tipToBBText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            tipToBBText.setAttribute('x', (bbX + saddleTipX) / 2);
+            tipToBBText.setAttribute('y', bbY - 15); // Above the horizontal line
+            tipToBBText.setAttribute('class', 'measurement-text');
+            tipToBBText.setAttribute('font-weight', 'bold');
+            tipToBBText.setAttribute('font-size', '12px');
+            tipToBBText.setAttribute('text-anchor', 'middle');
+            tipToBBText.textContent = `TIP-TO-BB: ${saddleTipToBB}mm`;
+            svg.appendChild(tipToBBText);
+
+            // Seatpost setback label
+            const setbackText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            setbackText.setAttribute('x', seatpostHeadX + 10);
+            setbackText.setAttribute('y', seatpostHeadY - 10);
+            setbackText.setAttribute('class', 'measurement-text');
+            setbackText.setAttribute('font-size', '12px');
+            setbackText.textContent = `SETBACK: ${Math.round(seatpostSetback)}mm`;
+            svg.appendChild(setbackText);
         }
 
 
