@@ -3,217 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bike Fit Calculator</title>
+    <title>Bike Geometry Visualizer - CLEAN LOGIC</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 3fr 1fr;
-            gap: 30px;
-            padding: 30px;
-        }
-
-        .input-section {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 10px;
-            height: fit-content;
-        }
-
-        .input-group {
-            margin-bottom: 25px;
-        }
-
-        .input-group h3 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 1.2em;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 5px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 80px;
-            gap: 10px;
-            margin-bottom: 12px;
-            align-items: center;
-        }
-
-        .form-row label {
-            font-weight: 500;
-            color: #2c3e50;
-        }
-
-        .form-row input {
-            padding: 8px 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 5px;
-            font-size: 14px;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-row input:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-
-        .bike-diagram {
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 10px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .bike-diagram h3 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
-
-        .results-section {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 10px;
-            height: fit-content;
-        }
-
-        .results-section h3 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 1.3em;
-            border-bottom: 2px solid #27ae60;
-            padding-bottom: 5px;
-        }
-
-        .result-item {
-            background: white;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #27ae60;
-        }
-
-        .result-item h4 {
-            color: #2c3e50;
-            margin-bottom: 8px;
-        }
-
-        .result-value {
-            font-size: 1.4em;
-            font-weight: bold;
-            color: #27ae60;
-        }
-
-        .result-status {
-            margin-top: 5px;
-            font-size: 0.9em;
-            color: #7f8c8d;
-        }
-
-        .validation-section {
-            background: #e8f5e8;
-            border: 1px solid #27ae60;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 20px;
-        }
-
-        .validation-section h4 {
-            color: #27ae60;
-            margin-bottom: 10px;
-        }
-
-        .test-button {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s ease;
-        }
-
-        .test-button:hover {
-            background: #2980b9;
-        }
-
-        .warning {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-
-        .success {
-            color: #27ae60;
-            font-weight: bold;
-        }
-
-        @media (max-width: 1200px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .measurement-line {
-            stroke: #e74c3c;
-            stroke-width: 2;
-            marker-end: url(#arrowhead);
-        }
-
-        .measurement-text {
-            font-family: Arial, sans-serif;
-            font-size: 12px;
-            fill: #e74c3c;
-            font-weight: bold;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; color: white; margin-bottom: 30px; }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .main-content { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; padding: 30px; }
+        .input-section { background: #f8f9fa; padding: 25px; border-radius: 10px; height: fit-content; }
+        .input-group { margin-bottom: 25px; }
+        .input-group h3 { color: #2c3e50; margin-bottom: 15px; font-size: 1.2em; }
+        .form-row { display: grid; grid-template-columns: 1fr 80px; gap: 10px; margin-bottom: 10px; align-items: center; }
+        label { font-weight: 500; color: #495057; }
+        input[type="number"] { padding: 8px; border: 2px solid #e9ecef; border-radius: 5px; font-size: 14px; }
+        .bike-diagram { background: white; border: 1px solid #e9ecef; border-radius: 10px; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .test-button { background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .measurement-text { font-family: 'Courier New', monospace; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚴‍♂️ Bike Fit Calculator</h1>
-            <p>Calculate seatpost setback, stem length/angle, and spacer height based on frame geometry and fit requirements</p>
+            <h1>🚴‍♂️ Bike Geometry Visualizer</h1>
+            <p>Clean logic: Fixed inputs → Saddle position → Target handlebars → Manual components → Actual handlebars</p>
         </div>
 
         <div class="main-content">
@@ -221,66 +34,29 @@
             <div class="input-section">
                 <div class="input-group">
                     <h3>Frame Geometry (mm/degrees)</h3>
-                    <div class="form-row">
-                        <label for="reach">Reach:</label>
-                        <input type="number" id="reach" step="0.1" placeholder="378">
-                    </div>
-                    <div class="form-row">
-                        <label for="stack">Stack:</label>
-                        <input type="number" id="stack" step="0.1" placeholder="580">
-                    </div>
-                    <div class="form-row">
-                        <label for="seatTube">Seat Tube C-T:</label>
-                        <input type="number" id="seatTube" step="0.1" placeholder="536">
-                    </div>
-                    <div class="form-row">
-                        <label for="headAngle">Head Angle:</label>
-                        <input type="number" id="headAngle" step="0.1" placeholder="72.25">
-                    </div>
-                    <div class="form-row">
-                        <label for="seatAngle">Seat Angle:</label>
-                        <input type="number" id="seatAngle" step="0.1" placeholder="73.75">
-                    </div>
-                    <div class="form-row">
-                        <label for="headTube">Head Tube:</label>
-                        <input type="number" id="headTube" step="0.1" placeholder="157">
-                    </div>
+                    <div class="form-row"><label>Reach:</label><input type="number" id="reach" placeholder="378"></div>
+                    <div class="form-row"><label>Stack:</label><input type="number" id="stack" placeholder="580"></div>
+                    <div class="form-row"><label>Seat Tube C-T:</label><input type="number" id="seatTube" placeholder="536"></div>
+                    <div class="form-row"><label>Head Angle:</label><input type="number" id="headAngle" placeholder="72.25"></div>
+                    <div class="form-row"><label>Seat Angle:</label><input type="number" id="seatAngle" placeholder="73.75"></div>
+                    <div class="form-row"><label>Head Tube:</label><input type="number" id="headTube" placeholder="157"></div>
                 </div>
 
                 <div class="input-group">
                     <h3>Required Bike Fit (mm)</h3>
-                    <div class="form-row">
-                        <label for="saddleHeight">Saddle Height:</label>
-                        <input type="number" id="saddleHeight" step="0.1" placeholder="760">
-                    </div>
-                    <div class="form-row">
-                        <label for="saddleTipToBB">Tip of Saddle to BB:</label>
-                        <input type="number" id="saddleTipToBB" step="0.1" placeholder="91">
-                    </div>
-                    <div class="form-row">
-                        <label for="saddleToBarHeight">Saddle to Bar Top Drop:</label>
-                        <input type="number" id="saddleToBarHeight" step="0.1" placeholder="64">
-                    </div>
-                    <div class="form-row">
-                        <label for="saddleTipToBarCenter">Tip of Saddle to Bar Top:</label>
-                        <input type="number" id="saddleTipToBarCenter" step="0.1" placeholder="550">
-                    </div>
+                    <div class="form-row"><label>Saddle Height:</label><input type="number" id="saddleHeight" placeholder="760"></div>
+                    <div class="form-row"><label>Tip of Saddle to BB:</label><input type="number" id="saddleTipToBB" placeholder="91"></div>
+                    <div class="form-row"><label>Saddle to Bar Top Drop:</label><input type="number" id="saddleToBarHeight" placeholder="64"></div>
+                    <div class="form-row"><label>Tip of Saddle to Bar Top:</label><input type="number" id="saddleTipToBarCenter" placeholder="550"></div>
                 </div>
 
                 <div class="input-group">
                     <h3>Component Options</h3>
-                    <div class="form-row">
-                        <label for="saddleLength">Saddle Length:</label>
-                        <input type="number" id="saddleLength" step="0.1" value="250" placeholder="250">
-                    </div>
-                    <div class="form-row">
-                        <label for="stemAngle">Stem Angle:</label>
-                        <input type="number" id="stemAngle" step="1" value="-6" placeholder="-6">
-                    </div>
-                    <div class="form-row">
-                        <label for="saddleRailPosition">Saddle Rail Position:</label>
-                        <input type="number" id="saddleRailPosition" step="1" value="0" placeholder="0" title="mm fore(+) or aft(-) from center">
-                    </div>
+                    <div class="form-row"><label>Saddle Length:</label><input type="number" id="saddleLength" value="250" placeholder="250"></div>
+                    <div class="form-row"><label>Saddle Rail Position:</label><input type="number" id="saddleRailPosition" value="0" placeholder="0"></div>
+                    <div class="form-row"><label>Spacer Height (0-40mm):</label><input type="number" id="spacerHeight" value="20" placeholder="20" min="0" max="40" step="10"></div>
+                    <div class="form-row"><label>Stem Length (80-110mm):</label><input type="number" id="stemLength" value="90" placeholder="90" min="80" max="110" step="10"></div>
+                    <div class="form-row"><label>Stem Angle (-10° to +10°):</label><input type="number" id="stemAngle" value="-6" placeholder="-6" min="-10" max="10" step="6"></div>
                 </div>
 
                 <div class="validation-section">
@@ -293,129 +69,32 @@
             <!-- Bike Diagram -->
             <div class="bike-diagram">
                 <h3>Bike Geometry Visualization</h3>
-                <svg id="bikeSvg" width="800" height="600" viewBox="0 0 800 600">
-                    <defs>
-                        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                            <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" />
-                        </marker>
-                    </defs>
+                <svg id="bikeSvg" width="1400" height="1000" viewBox="0 0 1400 1000">
                     <!-- Bike frame will be drawn here -->
                 </svg>
-            </div>
-
-            <!-- Results Section -->
-            <div class="results-section">
-                <h3>🔧 Component Recommendations</h3>
-                
-                <div class="result-item">
-                    <h4>Seatpost Setback</h4>
-                    <div class="result-value" id="seatpostSetback">-- mm</div>
-                    <div class="result-status" id="seatpostStatus">Enter measurements</div>
-                </div>
-
-                <div class="result-item">
-                    <h4>Stem Length</h4>
-                    <div class="result-value" id="stemLength">-- mm</div>
-                    <div class="result-status" id="stemStatus">Enter measurements</div>
-                </div>
-
-                <div class="result-item">
-                    <h4>Headset Spacers</h4>
-                    <div class="result-value" id="spacerHeight">-- mm</div>
-                    <div class="result-status" id="spacerStatus">Enter measurements</div>
-                </div>
-
-
-
-                <div class="input-group" style="margin-top: 30px;">
-                    <h3>📋 Shopping List</h3>
-                    <div id="shoppingList" style="background: white; padding: 15px; border-radius: 8px; margin-top: 10px;">
-                        Enter measurements to generate component list
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 
     <script>
-        function findOptimalStemConfig(headTubeTopX, headTubeTopY, headAngle, saddleTipX, saddleTipY, saddleCenterY, targetDrop, targetTipToBar, scale) {
-            // Standard component options
-            const spacerOptions = [0, 10, 20, 30, 40]; // mm
-            const stemLengthOptions = [80, 90, 100, 110]; // mm  
-            const stemAngleOptions = [10, 6, 0, -6, -10]; // degrees
-            const stemHeight = 20; // mm - constant
-            
-            const headAngleRad = headAngle * (Math.PI / 180);
-            let allConfigs = [];
-            
-            // Try every combination
-            for (let spacers of spacerOptions) {
-                for (let stemLength of stemLengthOptions) {
-                    for (let stemAngle of stemAngleOptions) {
-                        
-                        // Calculate actual handlebar position with this config
-                        
-                        // 1. Spacer position
-                        const spacerTopX = headTubeTopX - (spacers * scale) * Math.cos(headAngleRad);
-                        const spacerTopY = headTubeTopY - (spacers * scale) * Math.sin(headAngleRad);
-                        
-                        // 2. Stem height position  
-                        const stemBodyTopX = spacerTopX - (stemHeight * scale) * Math.cos(headAngleRad);
-                        const stemBodyTopY = spacerTopY - (stemHeight * scale) * Math.sin(headAngleRad);
-                        
-                        // 3. Stem extension
-                        const stemAngleRad = (headAngle - 90 - stemAngle) * (Math.PI / 180);
-                        const actualBarX = stemBodyTopX + (stemLength * scale) * Math.cos(stemAngleRad);
-                        const actualBarY = stemBodyTopY + (stemLength * scale) * Math.sin(stemAngleRad);
-                        
-                        // Calculate actual bike fit measurements achieved
-                        // Calculate tip-to-bar distance to TOP of handlebar circle (32mm diameter = 16mm radius)
-                        const handlebarRadius = 16; // mm
-                        const actualBarTopY = actualBarY - (handlebarRadius * scale);
-                        
-                        const actualDrop = (actualBarTopY - saddleCenterY) / scale; // Saddle to bar top drop
-                        const actualTipToBar = Math.sqrt(
-                            Math.pow((actualBarX - saddleTipX) / scale, 2) + 
-                            Math.pow((actualBarTopY - saddleTipY) / scale, 2)
-                        ); // Tip to bar top distance
-                        
-                        // Calculate errors for bike fit measurements (prioritize drop)
-                        const dropError = Math.abs(actualDrop - targetDrop);
-                        const tipToBarError = Math.abs(actualTipToBar - targetTipToBar);
-                        
-                        // Weight drop error more heavily (3x) since it's more critical
-                        const totalError = (dropError * 3) + tipToBarError;
-                        
-                        allConfigs.push({
-                            spacers, stemLength, stemAngle, 
-                            error: totalError,
-                            actualX: actualBarX, actualY: actualBarY,
-                            actualDrop: Math.round(actualDrop * 10) / 10,
-                            actualTipToBar: Math.round(actualTipToBar * 10) / 10,
-                            dropError: Math.round(dropError * 10) / 10,
-                            tipToBarError: Math.round(tipToBarError * 10) / 10
-                        });
-                    }
-                }
-            }
-            
-            // Store all configs for debugging, return top 5 best fits
-            window.allOptimizationConfigs = allConfigs.sort((a, b) => a.error - b.error);
-            return window.allOptimizationConfigs.slice(0, 5);
-        }
-
-        // Simplified frame geometry visualization
+        // === CLEAN BIKE FIT LOGIC ===
+        
         function calculateBikeFit() {
-            // Get frame geometry values
+            console.log('🔧 === CLEAN BIKE FIT CALCULATION ===');
+            
+            // === STEP 1: FIXED FRAME GEOMETRY ===
             const reach = parseFloat(document.getElementById('reach').value) || 378;
             const stack = parseFloat(document.getElementById('stack').value) || 580;
             const headAngle = parseFloat(document.getElementById('headAngle').value) || 72.25;
             const seatAngle = parseFloat(document.getElementById('seatAngle').value) || 73.75;
             const headTube = parseFloat(document.getElementById('headTube').value) || 157;
             const seatTube = parseFloat(document.getElementById('seatTube').value) || 536;
-            const bbDrop = 72; // Fixed value since not needed for bike fit calculations
+            const stemStackHeight = 20; // mm - fixed component height
+            const handlebarDiameter = 32; // mm - fixed
             
-            // Get bike fit values
+            console.log('📐 Frame:', { reach, stack, headAngle, seatAngle, headTube, seatTube });
+            
+            // === STEP 2: FIXED BIKE FIT MEASUREMENTS ===
             const saddleHeight = parseFloat(document.getElementById('saddleHeight').value) || 760;
             const saddleLength = parseFloat(document.getElementById('saddleLength').value) || 250;
             const saddleTipToBB = parseFloat(document.getElementById('saddleTipToBB').value) || 91;
@@ -423,857 +102,321 @@
             const saddleToBarHeight = parseFloat(document.getElementById('saddleToBarHeight').value) || 64;
             const saddleTipToBarCenter = parseFloat(document.getElementById('saddleTipToBarCenter').value) || 550;
             
-            // === SEATPOST SETBACK CALCULATION ===
-            // Calculate required seatpost setback to achieve target tip-to-BB distance
+            console.log('🎯 Bike Fit:', { saddleHeight, saddleTipToBB, saddleToBarHeight, saddleTipToBarCenter });
             
-            // Convert angles to radians
-            const seatAngleRad = (seatAngle * Math.PI) / 180;
+            // === STEP 3: CALCULATE SADDLE POSITION ===
+            const scale = 1.0, bbX = 400, bbY = 800;
+            const seatAngleRad = seatAngle * Math.PI / 180;
+            const seatpostLength = saddleHeight - seatTube;
             
-            // Calculate seatpost top position (no setback yet)
-            const seatpostTopX_noSetback = -saddleHeight * Math.cos(seatAngleRad); // Relative to BB
-            const seatpostTopY_noSetback = -saddleHeight * Math.sin(seatAngleRad); // Relative to BB
+            // Seatpost shaft top (no setback yet)
+            const shaftTopX = bbX - ((seatTube + seatpostLength) * scale) * Math.cos(seatAngleRad);
+            const shaftTopY = bbY - ((seatTube + seatpostLength) * scale) * Math.sin(seatAngleRad);
             
-            // Calculate saddle tip position with no setback (tip is forward of attachment point)
-            const saddleTipX_noSetback = seatpostTopX_noSetback + (saddleLength / 2) + saddleRailPosition;
+            // Required setback to achieve target tip-to-BB
+            const targetTipX = bbX - saddleTipToBB;
+            const requiredSetback = shaftTopX + (saddleLength/2) + saddleRailPosition - targetTipX;
             
-            // Calculate current HORIZONTAL tip-to-BB distance (matching visualization)
-            const currentHorizontalTipToBB = Math.abs(saddleTipX_noSetback);
+            // Final saddle position
+            const seatpostHeadX = shaftTopX - requiredSetback;
+            const seatpostHeadY = shaftTopY;
+            const saddleCenterX = seatpostHeadX + saddleRailPosition;
+            const saddleCenterY = seatpostHeadY;
+            const saddleTipX = saddleCenterX + (saddleLength/2);
+            const saddleTipY = saddleCenterY;
             
-            // Calculate setback needed (setback moves saddle backwards horizontally)
-            // Positive setback reduces the horizontal distance to BB
-            const requiredSetback = currentHorizontalTipToBB - saddleTipToBB;
+            console.log('🪑 Saddle tip at:', Math.round(saddleTipX), Math.round(saddleTipY), '| Distance from BB:', Math.round(bbX - saddleTipX));
             
-            // Constrain setback to reasonable range (0-30mm)
-            const seatpostSetback = Math.max(0, Math.min(30, requiredSetback));
-
-            // === STEM OPTIMIZATION ===
+            // === STEP 4: CALCULATE TARGET HANDLEBAR POSITION ===
+            // Bike fit measurements are to the TOP of the handlebar, not center
+            const horizontalDistance = Math.sqrt(Math.pow(saddleTipToBarCenter, 2) - Math.pow(saddleToBarHeight, 2));
+            const targetBarTopX = saddleTipX + horizontalDistance;
+            const targetBarTopY = saddleTipY + saddleToBarHeight;
             
-            // Calculate target handlebar position from fit requirements
-            const scale = 0.6; // Same scale as diagram
-            const offsetX = 100;
-            const offsetY = 100;
-            const bbX = offsetX + 200;
-            const bbY = offsetY + 450;
+            // Derive handlebar center from top position
+            const targetBarX = targetBarTopX;
+            const targetBarY = targetBarTopY + (handlebarDiameter/2);
             
-            // Head tube top position (for optimization calculation)
-            const headTubeTopX = bbX + (reach * scale);
-            const headTubeTopY = bbY - (stack * scale);
+            console.log('🎯 TARGET handlebar top at:', Math.round(targetBarTopX), Math.round(targetBarTopY));
             
-            // Saddle tip position (from seatpost + setback calculation)
-            const saddleCenterX = bbX - (saddleHeight * Math.cos(seatAngleRad) * scale) + (seatpostSetback * scale);
-            const saddleTipX = saddleCenterX + ((saddleLength / 2 + saddleRailPosition) * scale);
-            const saddleTipY = bbY - (saddleHeight * scale);
+            // Verify bike fit measurements
+            const actualTipToBarDistance = Math.sqrt(Math.pow(targetBarTopX - saddleTipX, 2) + Math.pow(targetBarTopY - saddleTipY, 2));
+            const actualSaddleToBarDrop = targetBarTopY - saddleTipY;
+            console.log('✅ Verification - Tip to bar:', Math.round(actualTipToBarDistance), 'vs target:', saddleTipToBarCenter);
+            console.log('✅ Verification - Saddle drop:', Math.round(actualSaddleToBarDrop), 'vs target:', saddleToBarHeight);
             
-            // Target handlebar position from fit requirements
-            const horizontalDistance = Math.sqrt((saddleTipToBarCenter * saddleTipToBarCenter) - (saddleToBarHeight * saddleToBarHeight));
-            const targetBarX = saddleTipX + (horizontalDistance * scale);
-            const targetBarY = saddleTipY + (saddleToBarHeight * scale); // DROP = handlebars BELOW saddle tip
+            // === STEP 5: MANUAL COMPONENT SELECTION ===
+            const spacerHeight = parseFloat(document.getElementById('spacerHeight').value) || 20;
+            const stemLength = parseFloat(document.getElementById('stemLength').value) || 90;
+            const stemAngle = parseFloat(document.getElementById('stemAngle').value) || -6;
             
-            // Calculate saddle center position (for drop measurement)
-            const saddleCenterY = bbY - (saddleHeight * scale);
+            console.log('🔧 COMPONENTS Selected:', { spacerHeight, stemLength, stemAngle });
+            console.log('💡 Try different values: Spacers 0-40mm (±10mm), Stem 80-110mm (±10mm), Angle -10° to +10°');
             
-            // Find optimal stem configuration based on bike fit measurements
-            const stemOptions = findOptimalStemConfig(
-                headTubeTopX, headTubeTopY, headAngle, 
-                saddleTipX, saddleTipY, saddleCenterY,
-                saddleToBarHeight, saddleTipToBarCenter, 
-                scale
-            );
+            // === STEP 6: CALCULATE ACTUAL HANDLEBAR POSITION ===
+            const headAngleRad = headAngle * Math.PI / 180;
+            const headTubeTopX = bbX + reach;
+            const headTubeTopY = bbY - stack;
             
-            // DEBUG: Show what the algorithm found
-            console.log('\n=== BIKE FIT OPTIMIZATION ===');
-            console.log('Target measurements:', { 
-                saddleDrop: saddleToBarHeight + 'mm', 
-                tipToBar: saddleTipToBarCenter + 'mm' 
-            });
-            console.log('\nTop 5 component options:');
+            const spacerTopX = headTubeTopX - (spacerHeight * scale) * Math.cos(headAngleRad);
+            const spacerTopY = headTubeTopY - (spacerHeight * scale) * Math.sin(headAngleRad);
             
-            for (let i = 0; i < stemOptions.length; i++) {
-                const opt = stemOptions[i];
-                console.log(`${i+1}. ${opt.spacers}mm spacers + ${opt.stemLength}mm stem + ${opt.stemAngle}°`);
-                console.log(`   Achieves: ${opt.actualDrop}mm drop (target: ${saddleToBarHeight}mm), ${opt.actualTipToBar}mm tip-to-bar (target: ${saddleTipToBarCenter}mm)`);
-                console.log(`   Errors: Drop ${opt.dropError}mm, Tip-to-bar ${opt.tipToBarError}mm, Total score: ${Math.round(opt.error * 10) / 10}`);
-                console.log('');
-            }
+            const stemBodyTopX = spacerTopX - (stemStackHeight * scale) * Math.cos(headAngleRad);
+            const stemBodyTopY = spacerTopY - (stemStackHeight * scale) * Math.sin(headAngleRad);
             
-            // Use best option
-            const bestConfig = stemOptions[0];
-            const spacerHeight = bestConfig.spacers;
-            const stemLength = bestConfig.stemLength;
-            const stemAngle = bestConfig.stemAngle;
-
-            // Update results with calculated values
-            updateResults({
-                seatpostSetback: Math.round(seatpostSetback * 10) / 10,
-                stemLength: stemLength,
-                spacerHeight: spacerHeight,
-                stemAngle: stemAngle,
-                stemOptions: stemOptions,
-                actualDrop: bestConfig.actualDrop,
-                actualTipToBar: bestConfig.actualTipToBar,
-                dropError: bestConfig.dropError,
-                tipToBarError: bestConfig.tipToBarError
-            });
-
-            // Draw the bike frame with actual geometry and fit data
+            const stemAngleRad = (headAngle - 90 - stemAngle) * (Math.PI / 180);
+            const actualBarX = stemBodyTopX + (stemLength * scale) * Math.cos(stemAngleRad);
+            const actualBarY = stemBodyTopY + (stemLength * scale) * Math.sin(stemAngleRad);
+            const actualBarTopY = actualBarY - (handlebarDiameter/2);
+            
+            console.log('🔧 ACTUAL handlebar top at:', Math.round(actualBarX), Math.round(actualBarTopY));
+            console.log('📊 Difference: X =', Math.round(actualBarX - targetBarTopX), 'Y =', Math.round(actualBarTopY - targetBarTopY));
+            
+            // Calculate actual fit achieved with selected components
+            const actualFitDrop = actualBarTopY - saddleTipY;
+            const actualFitTipToBar = Math.sqrt(Math.pow(actualBarX - saddleTipX, 2) + Math.pow(actualBarTopY - saddleTipY, 2));
+            const dropError = Math.abs(actualFitDrop - saddleToBarHeight);
+            const tipToBarError = Math.abs(actualFitTipToBar - saddleTipToBarCenter);
+            
+            console.log('🎯 FIT ACHIEVED with your components:');
+            console.log('   Drop:', Math.round(actualFitDrop), 'mm (target:', saddleToBarHeight, 'mm, error:', Math.round(dropError), 'mm)');
+            console.log('   Tip-to-Bar:', Math.round(actualFitTipToBar), 'mm (target:', saddleTipToBarCenter, 'mm, error:', Math.round(tipToBarError), 'mm)');
+            console.log('💡 Adjust components to minimize errors!');
+            
+            // === STEP 7: DRAW EVERYTHING ===
             drawBikeDiagram({
-                reach, stack, headAngle, seatAngle, headTube, seatTube, bbDrop,
-                saddleHeight, saddleLength, seatpostSetback, saddleTipToBB, saddleRailPosition, saddleToBarHeight, saddleTipToBarCenter, spacerHeight, stemLength, stemAngle,
-                actualDrop: bestConfig.actualDrop,
-                actualTipToBar: bestConfig.actualTipToBar,
-                dropError: bestConfig.dropError,
-                tipToBarError: bestConfig.tipToBarError
+                // Frame
+                reach, stack, headAngle, seatAngle, headTube, seatTube,
+                // Saddle
+                saddleHeight, saddleLength, saddleTipToBB, saddleRailPosition,
+                saddleCenterX, saddleCenterY, saddleTipX, saddleTipY,
+                // Target handlebars
+                targetBarX, targetBarY, targetBarTopX, targetBarTopY,
+                // Actual handlebars
+                actualBarX, actualBarY, actualBarTopY,
+                // Components
+                spacerHeight, stemLength, stemAngle, stemStackHeight, handlebarDiameter
             });
         }
-
-        function updateResults(results) {
-            // Seatpost setback
-            document.getElementById('seatpostSetback').textContent = results.seatpostSetback + ' mm';
-            const seatpostStatus = document.getElementById('seatpostStatus');
-            if (results.seatpostSetback < 20) {
-                seatpostStatus.innerHTML = '<span class="warning">⚠️ Below recommended range (20-30mm)</span>';
-            } else if (results.seatpostSetback > 30) {
-                seatpostStatus.innerHTML = '<span class="warning">⚠️ Above recommended range (20-30mm)</span>';
-            } else {
-                seatpostStatus.innerHTML = '<span class="success">✅ Within recommended range</span>';
-            }
-
-            // Stem length
-            document.getElementById('stemLength').textContent = Math.round(results.stemLength) + ' mm';
-            const stemStatus = document.getElementById('stemStatus');
-            const stemLengthRounded = Math.round(results.stemLength);
-            if (stemLengthRounded < 80) {
-                stemStatus.innerHTML = '<span class="warning">⚠️ Below recommended range (80-110mm)</span>';
-            } else if (stemLengthRounded > 110) {
-                stemStatus.innerHTML = '<span class="warning">⚠️ Above recommended range (80-110mm)</span>';
-            } else {
-                stemStatus.innerHTML = '<span class="success">✅ Within recommended range</span>';
-            }
-
-            // Spacer height
-            document.getElementById('spacerHeight').textContent = results.spacerHeight + ' mm';
-            const spacerStatus = document.getElementById('spacerStatus');
-            if (results.spacerHeight > 40) {
-                spacerStatus.innerHTML = '<span class="warning">⚠️ Above maximum (40mm)</span>';
-            } else {
-                spacerStatus.innerHTML = '<span class="success">✅ Within limits</span>';
-            }
-
-
-
-            // Update shopping list
-            updateShoppingList(results);
-        }
-
-        function updateShoppingList(results) {
-            let shoppingList = `
-                <strong>🎯 BIKE FIT OPTIMIZED!</strong><br><br>
-                📏 <strong>Reach:</strong> ${document.getElementById('reach').value}mm<br>
-                📐 <strong>Stack:</strong> ${document.getElementById('stack').value}mm<br>
-                🪑 <strong>Seat Angle:</strong> ${document.getElementById('seatAngle').value}°<br>
-                📏 <strong>Seat Tube C-T:</strong> ${document.getElementById('seatTube').value}mm<br>
-                🔧 <strong>Head Angle:</strong> ${document.getElementById('headAngle').value}°<br>
-                📏 <strong>Head Tube:</strong> ${document.getElementById('headTube').value}mm<br>
-                🏍️ <strong>Saddle Height:</strong> ${document.getElementById('saddleHeight').value}mm<br>
-                📏 <strong>Saddle Length:</strong> ${document.getElementById('saddleLength').value}mm<br>
-                🎯 <strong>Target Tip-to-BB:</strong> ${document.getElementById('saddleTipToBB').value}mm<br>
-                📐 <strong>Saddle-Bar Drop (to top):</strong> ${document.getElementById('saddleToBarHeight').value}mm<br>
-                📏 <strong>Tip-to-Bar Top:</strong> ${document.getElementById('saddleTipToBarCenter').value}mm<br><br>
-                
-                <strong>🏆 OPTIMIZED COMPONENTS:</strong><br>
-                🔧 <strong>Spacers:</strong> ${results.spacerHeight}mm<br>
-                🔧 <strong>Stem Height:</strong> 20mm (constant)<br>
-                🔧 <strong>Stem Length:</strong> ${results.stemLength}mm<br>
-                📐 <strong>Stem Angle:</strong> ${results.stemAngle}° from ⊥<br><br>
-                
-                <strong>📏 ACHIEVED FIT:</strong><br>
-                📐 <strong>Actual Drop:</strong> ${results.actualDrop || 'calculating...'}mm (target: ${document.getElementById('saddleToBarHeight').value}mm)<br>
-                📏 <strong>Actual Tip-to-Bar:</strong> ${results.actualTipToBar || 'calculating...'}mm (target: ${document.getElementById('saddleTipToBarCenter').value}mm)<br>
-                🎯 <strong>Drop Error:</strong> ${results.dropError || 0}mm<br>
-                🎯 <strong>Tip-to-Bar Error:</strong> ${results.tipToBarError || 0}mm<br>
-            `;
-            
-            // Add alternative options if available
-            if (results.stemOptions && results.stemOptions.length > 1) {
-                shoppingList += `<br><strong>📋 ALTERNATIVES:</strong><br>`;
-                for (let i = 1; i < Math.min(4, results.stemOptions.length); i++) {
-                    const option = results.stemOptions[i];
-                    shoppingList += `${i + 1}. ${option.spacers}mm spacers + ${option.stemLength}mm stem + ${option.stemAngle}°<br>`;
-                    shoppingList += `   → ${option.actualDrop}mm drop, ${option.actualTipToBar}mm tip-to-bar<br>`;
-                }
-            }
-            
-            shoppingList += `<br>
-                <strong>✅ What you should see:</strong><br>
-                • Red BB center point<br>
-                • Blue head tube top point<br>
-                • Red reach & blue stack lines<br>
-                • Dark gray frame triangle<br>
-                • Dark seatpost (shaft + setback head)<br>
-                • Purple saddle with red tip marker<br>
-                • Teal handlebar circle (positioned by optimization)<br>
-                • Orange spacers (optimized distance)<br>
-                • Dark gray stem height (constant 20mm component)<br>
-                • Dark gray stem (optimized length & angle)<br>
-                • Orange saddle height (straight up seatpost)<br>
-                • Red tip-to-BB (horizontal measurement)<br>
-                • Purple saddle drop measurement (to top of handlebar)<br>
-                • Green tip-to-bar diagonal measurement (to top of handlebar)<br>
-                • All measurement labels<br><br>
-                <em>Components optimized for perfect fit! 🚴‍♂️</em>
-            `;
-            document.getElementById('shoppingList').innerHTML = shoppingList;
-        }
-
+        
         function drawBikeDiagram(params) {
             const svg = document.getElementById('bikeSvg');
-            const scale = 0.6; // Adjusted scale to fit better
-            const offsetX = 100;
-            const offsetY = 100;
+            const scale = 1.0;
+            const bbX = 400, bbY = 800;
             
             // Clear previous drawing
-            svg.innerHTML = svg.querySelector('defs').outerHTML;
-
-            // Bottom bracket is our origin point - positioned to allow space for measurements
-            const bbX = offsetX + 200;
-            const bbY = offsetY + 450; // More space above for stack measurement
-
-            // Frame geometry values
-            const reach = params.reach || 378;
-            const stack = params.stack || 580;
-            const seatAngle = params.seatAngle || 73.75;
-            const seatTube = params.seatTube || 536;
-            const headAngle = params.headAngle || 72.25;
-            const headTube = params.headTube || 157;
-
-
-            // Head tube top position (scaled) - still needed for measurements
-            const headTubeTopX = bbX + (reach * scale);
-            const headTubeTopY = bbY - (stack * scale);
-
-            // Calculate seat tube top position
-            // Seat angle is measured from horizontal, seat tube leans back slightly  
-            const seatAngleRad = (seatAngle * Math.PI) / 180;
-            const seatTubeCTLength = seatTube * scale; // Use actual C-T measurement scaled
-            const seatTubeTopX = bbX - (seatTubeCTLength) * Math.cos(seatAngleRad);
-            const seatTubeTopY = bbY - (seatTubeCTLength) * Math.sin(seatAngleRad);
-
-            // Calculate head tube bottom position
-            // Head angle is measured from horizontal (72.25° clockwise from horizontal)
-            const headAngleRad = (headAngle * Math.PI) / 180;
-            const headTubeBottomX = headTubeTopX + (headTube * scale) * Math.cos(headAngleRad);
-            const headTubeBottomY = headTubeTopY + (headTube * scale) * Math.sin(headAngleRad);
-
-            // === STEP 6: BB, STACK, REACH + SEAT TUBE + HEAD TUBE + TOP TUBE + SEATPOST + SADDLE + HANDLEBARS ===
+            svg.innerHTML = '';
             
-            // 1. Draw Bottom Bracket (origin point)
+            // Frame angles
+            const seatAngleRad = params.seatAngle * Math.PI / 180;
+            const headAngleRad = params.headAngle * Math.PI / 180;
+            
+            // Key points
+            const headTubeTopX = bbX + params.reach;
+            const headTubeTopY = bbY - params.stack;
+            const seatTubeTopX = bbX - (params.seatTube * Math.cos(seatAngleRad));
+            const seatTubeTopY = bbY - (params.seatTube * Math.sin(seatAngleRad));
+            
+            // 1. Draw Bottom Bracket
             const bbCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             bbCircle.setAttribute('cx', bbX);
             bbCircle.setAttribute('cy', bbY);
             bbCircle.setAttribute('r', 8);
             bbCircle.setAttribute('fill', '#e74c3c');
-            bbCircle.setAttribute('stroke', '#c0392b');
-            bbCircle.setAttribute('stroke-width', '2');
             svg.appendChild(bbCircle);
-
-            // 2. Draw Head Tube Top point
-            const headTubeTopCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            headTubeTopCircle.setAttribute('cx', headTubeTopX);
-            headTubeTopCircle.setAttribute('cy', headTubeTopY);
-            headTubeTopCircle.setAttribute('r', 4);
-            headTubeTopCircle.setAttribute('fill', '#3498db');
-            headTubeTopCircle.setAttribute('stroke', '#2980b9');
-            headTubeTopCircle.setAttribute('stroke-width', '1');
-            svg.appendChild(headTubeTopCircle);
-
-            // 3. Draw REACH measurement (horizontal) - OVERLAID on actual measurement
-            const reachLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            reachLine.setAttribute('x1', bbX);
-            reachLine.setAttribute('y1', bbY); // Direct from BB center
-            reachLine.setAttribute('x2', headTubeTopX);
-            reachLine.setAttribute('y2', bbY); // Horizontal line at BB level
-            reachLine.setAttribute('stroke', '#e74c3c');
-            reachLine.setAttribute('stroke-width', '3');
-            reachLine.setAttribute('stroke-dasharray', '5,5'); // Dashed line
-            svg.appendChild(reachLine);
-
-            // REACH label - positioned above the line
-            const reachText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            reachText.setAttribute('x', (bbX + headTubeTopX) / 2);
-            reachText.setAttribute('y', bbY - 10);
-            reachText.setAttribute('text-anchor', 'middle');
-            reachText.setAttribute('class', 'measurement-text');
-            reachText.setAttribute('font-weight', 'bold');
-            reachText.textContent = `REACH: ${reach}mm`;
-            svg.appendChild(reachText);
-
-            // 4. Draw STACK measurement (vertical) - OVERLAID on actual measurement
-            const stackLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            stackLine.setAttribute('x1', bbX); // Direct from BB center
-            stackLine.setAttribute('y1', bbY);
-            stackLine.setAttribute('x2', bbX); // Vertical line at BB X position
-            stackLine.setAttribute('y2', headTubeTopY);
-            stackLine.setAttribute('stroke', '#3498db');
-            stackLine.setAttribute('stroke-width', '3');
-            stackLine.setAttribute('stroke-dasharray', '5,5'); // Dashed line
-            svg.appendChild(stackLine);
-
-            // STACK label - positioned beside the line
-            const stackText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            stackText.setAttribute('x', bbX + 15);
-            stackText.setAttribute('y', (bbY + headTubeTopY) / 2);
-            stackText.setAttribute('text-anchor', 'start');
-            stackText.setAttribute('class', 'measurement-text');
-            stackText.setAttribute('font-weight', 'bold');
-            stackText.setAttribute('transform', `rotate(-90, ${bbX + 15}, ${(bbY + headTubeTopY) / 2})`);
-            stackText.textContent = `STACK: ${stack}mm`;
-            svg.appendChild(stackText);
-
-            // 5. Draw SEAT TUBE (connects directly to BB)
-            const seatTubeElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            seatTubeElement.setAttribute('x1', bbX);
-            seatTubeElement.setAttribute('y1', bbY);
-            seatTubeElement.setAttribute('x2', seatTubeTopX);
-            seatTubeElement.setAttribute('y2', seatTubeTopY);
-            seatTubeElement.setAttribute('stroke', '#34495e');
-            seatTubeElement.setAttribute('stroke-width', '6');
-            seatTubeElement.setAttribute('stroke-linecap', 'round');
-            svg.appendChild(seatTubeElement);
-
-            // Seat tube angle measurement line
-            const seatTubeAngleLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            seatTubeAngleLine.setAttribute('x1', bbX);
-            seatTubeAngleLine.setAttribute('y1', bbY);
-            seatTubeAngleLine.setAttribute('x2', seatTubeTopX);
-            seatTubeAngleLine.setAttribute('y2', seatTubeTopY);
-            seatTubeAngleLine.setAttribute('stroke', '#e67e22');
-            seatTubeAngleLine.setAttribute('stroke-width', '2');
-            seatTubeAngleLine.setAttribute('stroke-dasharray', '3,3');
-            svg.appendChild(seatTubeAngleLine);
-
-            // Mark the C-T point (same as seat tube end)
-            const seatTubeCTPoint = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            seatTubeCTPoint.setAttribute('cx', seatTubeTopX);
-            seatTubeCTPoint.setAttribute('cy', seatTubeTopY);
-            seatTubeCTPoint.setAttribute('r', 3);
-            seatTubeCTPoint.setAttribute('fill', '#e67e22');
-            svg.appendChild(seatTubeCTPoint);
-
-            // Seat tube C-T measurement line (same as seat tube)
-            const seatTubeCTMeasureLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            seatTubeCTMeasureLine.setAttribute('x1', bbX);
-            seatTubeCTMeasureLine.setAttribute('y1', bbY);
-            seatTubeCTMeasureLine.setAttribute('x2', seatTubeTopX);
-            seatTubeCTMeasureLine.setAttribute('y2', seatTubeTopY);
-            seatTubeCTMeasureLine.setAttribute('stroke', '#e67e22');
-            seatTubeCTMeasureLine.setAttribute('stroke-width', '3');
-            seatTubeCTMeasureLine.setAttribute('stroke-dasharray', '5,5');
-            svg.appendChild(seatTubeCTMeasureLine);
-
-            // Seat tube C-T label
-            const seatTubeCTText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            seatTubeCTText.setAttribute('x', seatTubeTopX - 60);
-            seatTubeCTText.setAttribute('y', (bbY + seatTubeTopY) / 2);
-            seatTubeCTText.setAttribute('class', 'measurement-text');
-            seatTubeCTText.setAttribute('font-weight', 'bold');
-            seatTubeCTText.textContent = `SEAT TUBE C-T: ${seatTube}mm`;
-            svg.appendChild(seatTubeCTText);
-
-            // Seat angle label
-            const seatAngleText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            seatAngleText.setAttribute('x', bbX - 80);
-            seatAngleText.setAttribute('y', bbY - 20);
-            seatAngleText.setAttribute('class', 'measurement-text');
-            seatAngleText.setAttribute('font-size', '12px');
-            seatAngleText.textContent = `SEAT ANGLE: ${seatAngle}°`;
-            svg.appendChild(seatAngleText);
-
-            // 6. Draw HEAD TUBE
-            const headTubeElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            headTubeElement.setAttribute('x1', headTubeTopX);
-            headTubeElement.setAttribute('y1', headTubeTopY);
-            headTubeElement.setAttribute('x2', headTubeBottomX);
-            headTubeElement.setAttribute('y2', headTubeBottomY);
-            headTubeElement.setAttribute('stroke', '#34495e');
-            headTubeElement.setAttribute('stroke-width', '6');
-            headTubeElement.setAttribute('stroke-linecap', 'round');
-            svg.appendChild(headTubeElement);
-
-            // Head tube measurement line
-            const headTubeMeasurementLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            headTubeMeasurementLine.setAttribute('x1', headTubeTopX);
-            headTubeMeasurementLine.setAttribute('y1', headTubeTopY);
-            headTubeMeasurementLine.setAttribute('x2', headTubeBottomX);
-            headTubeMeasurementLine.setAttribute('y2', headTubeBottomY);
-            headTubeMeasurementLine.setAttribute('stroke', '#9b59b6');
-            headTubeMeasurementLine.setAttribute('stroke-width', '2');
-            headTubeMeasurementLine.setAttribute('stroke-dasharray', '3,3');
-            svg.appendChild(headTubeMeasurementLine);
-
-            // Head tube length label
-            const headTubeText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            headTubeText.setAttribute('x', headTubeBottomX + 15);
-            headTubeText.setAttribute('y', (headTubeTopY + headTubeBottomY) / 2);
-            headTubeText.setAttribute('class', 'measurement-text');
-            headTubeText.setAttribute('font-weight', 'bold');
-            headTubeText.textContent = `HEAD TUBE: ${headTube}mm`;
-            svg.appendChild(headTubeText);
-
-            // Head angle label
-            const headAngleText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            headAngleText.setAttribute('x', headTubeTopX + 20);
-            headAngleText.setAttribute('y', headTubeTopY - 5);
-            headAngleText.setAttribute('class', 'measurement-text');
-            headAngleText.setAttribute('font-size', '12px');
-            headAngleText.textContent = `HEAD ANGLE: ${headAngle}°`;
-            svg.appendChild(headAngleText);
-
-            // 7. Draw TOP TUBE (effective) - connects seat tube top to head tube top
-            const topTubeElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            topTubeElement.setAttribute('x1', seatTubeTopX);
-            topTubeElement.setAttribute('y1', seatTubeTopY);
-            topTubeElement.setAttribute('x2', headTubeTopX);
-            topTubeElement.setAttribute('y2', headTubeTopY);
-            topTubeElement.setAttribute('stroke', '#34495e');
-            topTubeElement.setAttribute('stroke-width', '6');
-            topTubeElement.setAttribute('stroke-linecap', 'round');
-            svg.appendChild(topTubeElement);
-
-
-
-            // 6. Add labels for the points
-            const bbLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            bbLabel.setAttribute('x', bbX);
-            bbLabel.setAttribute('y', bbY + 25);
-            bbLabel.setAttribute('text-anchor', 'middle');
-            bbLabel.setAttribute('class', 'measurement-text');
-            bbLabel.setAttribute('font-size', '12px');
-            bbLabel.textContent = 'BB CENTER';
-            svg.appendChild(bbLabel);
-
-            const headLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            headLabel.setAttribute('x', headTubeTopX);
-            headLabel.setAttribute('y', headTubeTopY - 10);
-            headLabel.setAttribute('text-anchor', 'middle');
-            headLabel.setAttribute('class', 'measurement-text');
-            headLabel.setAttribute('font-size', '12px');
-            headLabel.textContent = 'HEAD TUBE TOP';
-            svg.appendChild(headLabel);
-
-            // === SPACERS ===
             
-            // Get spacer parameters
-            const spacerDistance = params.spacerHeight || 20; // mm
+            // 2. Draw frame triangle
+            const seatTube = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            seatTube.setAttribute('x1', bbX);
+            seatTube.setAttribute('y1', bbY);
+            seatTube.setAttribute('x2', seatTubeTopX);
+            seatTube.setAttribute('y2', seatTubeTopY);
+            seatTube.setAttribute('stroke', '#34495e');
+            seatTube.setAttribute('stroke-width', '6');
+            svg.appendChild(seatTube);
             
-            // Calculate spacer top position (extending from head tube top along head tube angle)
-            const spacerTopX = headTubeTopX - (spacerDistance * scale) * Math.cos(headAngleRad);
-            const spacerTopY = headTubeTopY - (spacerDistance * scale) * Math.sin(headAngleRad);
+            const headTubeBottomX = headTubeTopX + (params.headTube * Math.cos(headAngleRad));
+            const headTubeBottomY = headTubeTopY + (params.headTube * Math.sin(headAngleRad));
             
-            // Draw SPACERS (line extending from head tube top)
-            const spacerElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            spacerElement.setAttribute('x1', headTubeTopX);
-            spacerElement.setAttribute('y1', headTubeTopY);
-            spacerElement.setAttribute('x2', spacerTopX);
-            spacerElement.setAttribute('y2', spacerTopY);
-            spacerElement.setAttribute('stroke', '#f39c12');
-            spacerElement.setAttribute('stroke-width', '5');
-            spacerElement.setAttribute('stroke-linecap', 'round');
-            svg.appendChild(spacerElement);
+            const headTube = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            headTube.setAttribute('x1', headTubeTopX);
+            headTube.setAttribute('y1', headTubeTopY);
+            headTube.setAttribute('x2', headTubeBottomX);
+            headTube.setAttribute('y2', headTubeBottomY);
+            headTube.setAttribute('stroke', '#34495e');
+            headTube.setAttribute('stroke-width', '6');
+            svg.appendChild(headTube);
             
-            // Mark spacer top
-            const spacerTopCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            spacerTopCircle.setAttribute('cx', spacerTopX);
-            spacerTopCircle.setAttribute('cy', spacerTopY);
-            spacerTopCircle.setAttribute('r', 3);
-            spacerTopCircle.setAttribute('fill', '#f39c12');
-            svg.appendChild(spacerTopCircle);
+            const topTube = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            topTube.setAttribute('x1', seatTubeTopX);
+            topTube.setAttribute('y1', seatTubeTopY);
+            topTube.setAttribute('x2', headTubeTopX);
+            topTube.setAttribute('y2', headTubeTopY);
+            topTube.setAttribute('stroke', '#34495e');
+            topTube.setAttribute('stroke-width', '6');
+            svg.appendChild(topTube);
             
-            // Spacer distance label
-            const spacerText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            spacerText.setAttribute('x', (headTubeTopX + spacerTopX) / 2 + 15);
-            spacerText.setAttribute('y', (headTubeTopY + spacerTopY) / 2);
-            spacerText.setAttribute('class', 'measurement-text');
-            spacerText.setAttribute('font-size', '12px');
-            spacerText.textContent = `SPACERS: ${spacerDistance}mm`;
-            svg.appendChild(spacerText);
-
-            // === STEM HEIGHT (constant 20mm component) ===
+            // 3. Draw saddle
+            const saddleLeftX = params.saddleCenterX - (params.saddleLength/2);
+            const saddleRightX = params.saddleCenterX + (params.saddleLength/2);
             
-            const stemHeight = 20; // mm - constant stem body height
+            const saddle = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            saddle.setAttribute('x1', saddleLeftX);
+            saddle.setAttribute('y1', params.saddleCenterY);
+            saddle.setAttribute('x2', saddleRightX);
+            saddle.setAttribute('y2', params.saddleCenterY);
+            saddle.setAttribute('stroke', '#8e44ad');
+            saddle.setAttribute('stroke-width', '6');
+            svg.appendChild(saddle);
             
-            // Calculate stem body top position (extending from spacer top along head tube angle)
-            const stemBodyTopX = spacerTopX - (stemHeight * scale) * Math.cos(headAngleRad);
-            const stemBodyTopY = spacerTopY - (stemHeight * scale) * Math.sin(headAngleRad);
+            // 4. Draw TARGET handlebars (green)
+            const targetBar = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            targetBar.setAttribute('cx', params.targetBarX);
+            targetBar.setAttribute('cy', params.targetBarY);
+            targetBar.setAttribute('r', params.handlebarDiameter/2);
+            targetBar.setAttribute('fill', 'none');
+            targetBar.setAttribute('stroke', '#27ae60');
+            targetBar.setAttribute('stroke-width', '3');
+            targetBar.setAttribute('stroke-dasharray', '5,5');
+            svg.appendChild(targetBar);
             
-            // Draw STEM HEIGHT (line extending from spacer top)
-            const stemHeightElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            stemHeightElement.setAttribute('x1', spacerTopX);
-            stemHeightElement.setAttribute('y1', spacerTopY);
-            stemHeightElement.setAttribute('x2', stemBodyTopX);
-            stemHeightElement.setAttribute('y2', stemBodyTopY);
-            stemHeightElement.setAttribute('stroke', '#34495e');
-            stemHeightElement.setAttribute('stroke-width', '8');
-            stemHeightElement.setAttribute('stroke-linecap', 'round');
-            svg.appendChild(stemHeightElement);
+            // 5. Draw stem components
+            // Note: headAngleRad already declared above
             
-            // Mark stem body top
-            const stemBodyTopCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            stemBodyTopCircle.setAttribute('cx', stemBodyTopX);
-            stemBodyTopCircle.setAttribute('cy', stemBodyTopY);
-            stemBodyTopCircle.setAttribute('r', 4);
-            stemBodyTopCircle.setAttribute('fill', '#34495e');
-            svg.appendChild(stemBodyTopCircle);
+            // Spacers (orange line extending from head tube top)
+            const spacerTopX = headTubeTopX - (params.spacerHeight * Math.cos(headAngleRad));
+            const spacerTopY = headTubeTopY - (params.spacerHeight * Math.sin(headAngleRad));
             
-            // Stem height label
-            const stemHeightText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            stemHeightText.setAttribute('x', (spacerTopX + stemBodyTopX) / 2 + 20);
-            stemHeightText.setAttribute('y', (spacerTopY + stemBodyTopY) / 2);
-            stemHeightText.setAttribute('class', 'measurement-text');
-            stemHeightText.setAttribute('font-size', '12px');
-            stemHeightText.textContent = `STEM HEIGHT: ${stemHeight}mm`;
-            svg.appendChild(stemHeightText);
-
-            // === STEM (forward extension) ===
+            const spacers = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            spacers.setAttribute('x1', headTubeTopX);
+            spacers.setAttribute('y1', headTubeTopY);
+            spacers.setAttribute('x2', spacerTopX);
+            spacers.setAttribute('y2', spacerTopY);
+            spacers.setAttribute('stroke', '#f39c12');
+            spacers.setAttribute('stroke-width', '6');
+            spacers.setAttribute('stroke-linecap', 'round');
+            svg.appendChild(spacers);
             
-            // Get stem parameters
-            const stemLength = params.stemLength || 90; // mm
-            const stemAngle = params.stemAngle || -6; // degrees, offset from perpendicular to spacers
+            // Stem stack height (gray line - the 20mm component)
+            const stemBodyTopX = spacerTopX - (params.stemStackHeight * Math.cos(headAngleRad));
+            const stemBodyTopY = spacerTopY - (params.stemStackHeight * Math.sin(headAngleRad));
             
-            // Calculate stem angle: perpendicular to head tube + stem angle offset
-            // Perpendicular to head tube (forward direction): head tube angle - 90°
-            // Negative stem angle should point downwards, so we subtract the angle
-            const stemAngleRad = (headAngle - 90 - stemAngle) * (Math.PI / 180);
+            const stemStackElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            stemStackElement.setAttribute('x1', spacerTopX);
+            stemStackElement.setAttribute('y1', spacerTopY);
+            stemStackElement.setAttribute('x2', stemBodyTopX);
+            stemStackElement.setAttribute('y2', stemBodyTopY);
+            stemStackElement.setAttribute('stroke', '#2c3e50');
+            stemStackElement.setAttribute('stroke-width', '4');
+            stemStackElement.setAttribute('stroke-linecap', 'round');
+            svg.appendChild(stemStackElement);
             
-            // Calculate stem end position (extending from stem body top)
-            const stemEndX = stemBodyTopX + (stemLength * scale) * Math.cos(stemAngleRad);
-            const stemEndY = stemBodyTopY + (stemLength * scale) * Math.sin(stemAngleRad);
+            // Stem (gray line - forward extension)
+            const stemAngleRad = (params.headAngle - 90 - params.stemAngle) * (Math.PI / 180);
+            const stemEndX = stemBodyTopX + (params.stemLength * Math.cos(stemAngleRad));
+            const stemEndY = stemBodyTopY + (params.stemLength * Math.sin(stemAngleRad));
             
-            // DEBUG: Compare with optimization calculation
-            console.log('\n=== VISUALIZATION vs OPTIMIZATION COMPARISON ===');
-            console.log('Visualization stem end position:', { 
-                x: Math.round(stemEndX), 
-                y: Math.round(stemEndY),
-                config: `${spacerDistance}mm + ${stemLength}mm + ${stemAngle}°`
-            });
-            
-            // Find the same configuration in optimization results to compare
-            if (window.allOptimizationConfigs) {
-                const matchingOpt = window.allOptimizationConfigs.find(opt => 
-                    opt.spacers === spacerDistance && 
-                    opt.stemLength === stemLength && 
-                    opt.stemAngle === stemAngle
-                );
-                if (matchingOpt) {
-                    console.log('Optimization same config position:', { 
-                        x: Math.round(matchingOpt.actualX), 
-                        y: Math.round(matchingOpt.actualY),
-                        actualDrop: matchingOpt.actualDrop,
-                        actualTipToBar: matchingOpt.actualTipToBar
-                    });
-                    console.log('Position difference:', {
-                        deltaX: Math.round(stemEndX - matchingOpt.actualX),
-                        deltaY: Math.round(stemEndY - matchingOpt.actualY)
-                    });
-                    
-                    if (Math.abs(stemEndX - matchingOpt.actualX) > 5 || Math.abs(stemEndY - matchingOpt.actualY) > 5) {
-                        console.log('⚠️  POSITION MISMATCH DETECTED! Optimization and visualization disagree.');
-                    } else {
-                        console.log('✅ Positions match - calculations are consistent.');
-                    }
-                } else {
-                    console.log('❌ No matching optimization config found for comparison.');
-                }
-            }
-            
-            // Draw STEM (line extending from stem body top)
             const stemElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             stemElement.setAttribute('x1', stemBodyTopX);
             stemElement.setAttribute('y1', stemBodyTopY);
             stemElement.setAttribute('x2', stemEndX);
             stemElement.setAttribute('y2', stemEndY);
             stemElement.setAttribute('stroke', '#2c3e50');
-            stemElement.setAttribute('stroke-width', '6');
+            stemElement.setAttribute('stroke-width', '4');
             stemElement.setAttribute('stroke-linecap', 'round');
             svg.appendChild(stemElement);
             
-            // Mark stem end (where handlebars attach)
-            const stemEndCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            stemEndCircle.setAttribute('cx', stemEndX);
-            stemEndCircle.setAttribute('cy', stemEndY);
-            stemEndCircle.setAttribute('r', 4);
-            stemEndCircle.setAttribute('fill', '#2c3e50');
-            svg.appendChild(stemEndCircle);
+            // 6. Draw ACTUAL handlebars (teal) - positioned at stem end
+            const actualBar = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            actualBar.setAttribute('cx', stemEndX);
+            actualBar.setAttribute('cy', stemEndY);
+            actualBar.setAttribute('r', params.handlebarDiameter/2);
+            actualBar.setAttribute('fill', '#16a085');
+            actualBar.setAttribute('stroke', '#138d75');
+            actualBar.setAttribute('stroke-width', '2');
+            svg.appendChild(actualBar);
             
-            // Stem length label
-            const stemLengthText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            stemLengthText.setAttribute('x', (stemBodyTopX + stemEndX) / 2 + 15);
-            stemLengthText.setAttribute('y', (stemBodyTopY + stemEndY) / 2 - 5);
-            stemLengthText.setAttribute('class', 'measurement-text');
-            stemLengthText.setAttribute('font-size', '12px');
-            stemLengthText.textContent = `STEM: ${stemLength}mm`;
-            svg.appendChild(stemLengthText);
-            
-            // Stem angle label
-            const stemAngleText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            stemAngleText.setAttribute('x', (stemBodyTopX + stemEndX) / 2 + 15);
-            stemAngleText.setAttribute('y', (stemBodyTopY + stemEndY) / 2 + 10);
-            stemAngleText.setAttribute('class', 'measurement-text');
-            stemAngleText.setAttribute('font-size', '10px');
-            stemAngleText.textContent = `${stemAngle}° from ⊥`;
-            svg.appendChild(stemAngleText);
-
-            // === BIKE FIT COMPONENTS ===
-            
-            // Get bike fit parameters
-            const saddleHeight = params.saddleHeight || 760;
-            const saddleLength = params.saddleLength || 250;
-            const seatpostSetback = params.seatpostSetback || 25;
-            const saddleTipToBB = params.saddleTipToBB || 91;
-            const saddleRailPosition = params.saddleRailPosition || 0;
-            const saddleToBarHeight = params.saddleToBarHeight || 64;
-            const saddleTipToBarCenter = params.saddleTipToBarCenter || 550;
-            
-            // Calculate seatpost length: saddleHeight - seatTube
-            const seatpostLength = saddleHeight - seatTube;
-            
-            // Calculate seatpost shaft top position (along seat tube, no setback yet)
-            const seatpostShaftTopX = bbX - ((seatTube + seatpostLength) * scale) * Math.cos(seatAngleRad);
-            const seatpostShaftTopY = bbY - ((seatTube + seatpostLength) * scale) * Math.sin(seatAngleRad);
-            
-            // Calculate seatpost head position (with setback - perpendicular to seat tube)
-            const setbackX = -(seatpostSetback * scale) * Math.sin(seatAngleRad); // Perpendicular to seat tube
-            const setbackY = -(seatpostSetback * scale) * Math.cos(seatAngleRad); // Perpendicular to seat tube
-            const seatpostHeadX = seatpostShaftTopX + setbackX;
-            const seatpostHeadY = seatpostShaftTopY + setbackY;
-
-            // 8. Draw SEATPOST SHAFT (from seat tube top to seatpost shaft top)
-            const seatpostShaftElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            seatpostShaftElement.setAttribute('x1', seatTubeTopX);
-            seatpostShaftElement.setAttribute('y1', seatTubeTopY);
-            seatpostShaftElement.setAttribute('x2', seatpostShaftTopX);
-            seatpostShaftElement.setAttribute('y2', seatpostShaftTopY);
-            seatpostShaftElement.setAttribute('stroke', '#2c3e50');
-            seatpostShaftElement.setAttribute('stroke-width', '4');
-            seatpostShaftElement.setAttribute('stroke-linecap', 'round');
-            svg.appendChild(seatpostShaftElement);
-
-            // 8b. Draw SEATPOST HEAD (setback portion)
-            const seatpostHeadElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            seatpostHeadElement.setAttribute('x1', seatpostShaftTopX);
-            seatpostHeadElement.setAttribute('y1', seatpostShaftTopY);
-            seatpostHeadElement.setAttribute('x2', seatpostHeadX);
-            seatpostHeadElement.setAttribute('y2', seatpostHeadY);
-            seatpostHeadElement.setAttribute('stroke', '#2c3e50');
-            seatpostHeadElement.setAttribute('stroke-width', '4');
-            seatpostHeadElement.setAttribute('stroke-linecap', 'round');
-            svg.appendChild(seatpostHeadElement);
-
-            // 9. Draw SADDLE (horizontal line with rail adjustment)
-            const saddleLengthScaled = (saddleLength * scale) / 2; // Half length for centering
-            const saddleRailAdjustment = saddleRailPosition * scale; // Fore/aft adjustment on rails
-            
-            // Saddle position (centered on seatpost head + rail adjustment)
-            const saddleCenterX = seatpostHeadX + saddleRailAdjustment;
-            const saddleCenterY = seatpostHeadY;
-            
-            const saddleLeftX = saddleCenterX - saddleLengthScaled;
-            const saddleRightX = saddleCenterX + saddleLengthScaled;
-            
-            const saddleElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            saddleElement.setAttribute('x1', saddleLeftX);
-            saddleElement.setAttribute('y1', saddleCenterY);
-            saddleElement.setAttribute('x2', saddleRightX);
-            saddleElement.setAttribute('y2', saddleCenterY);
-            saddleElement.setAttribute('stroke', '#8e44ad');
-            saddleElement.setAttribute('stroke-width', '6');
-            saddleElement.setAttribute('stroke-linecap', 'round');
-            svg.appendChild(saddleElement);
-            
-            // Mark saddle tip (nose)
-            const saddleTipX = saddleRightX; // Right end is the tip/nose
-            const saddleTipY = saddleCenterY;
-            
-            const saddleTipCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            saddleTipCircle.setAttribute('cx', saddleTipX);
-            saddleTipCircle.setAttribute('cy', saddleTipY);
-            saddleTipCircle.setAttribute('r', 3);
-            saddleTipCircle.setAttribute('fill', '#e74c3c');
-            svg.appendChild(saddleTipCircle);
-
-            // === HANDLEBARS ===
-            
-            // Handlebars are positioned at the stem end (from optimization)
-            // The stem end position was calculated to match the fit requirements exactly
-            const handlebarX = stemEndX;
-            const handlebarY = stemEndY;
-            
-            // 10. Draw HANDLEBARS (32mm diameter circle - side view)
-            const handlebarRadius = (32 / 2) * scale; // 32mm diameter = 16mm radius, scaled
-            const handlebarCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            handlebarCircle.setAttribute('cx', handlebarX);
-            handlebarCircle.setAttribute('cy', handlebarY);
-            handlebarCircle.setAttribute('r', handlebarRadius);
-            handlebarCircle.setAttribute('fill', '#16a085');
-            handlebarCircle.setAttribute('stroke', '#138d75');
-            handlebarCircle.setAttribute('stroke-width', '2');
-            svg.appendChild(handlebarCircle);
-            
-            // Calculate top of handlebar circle for measurements
-            const handlebarTopY = handlebarY - handlebarRadius;
-
-            // Saddle height measurement (BB to saddle level, straight up seatpost shaft)
-            const saddleHeightLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            saddleHeightLine.setAttribute('x1', bbX);
-            saddleHeightLine.setAttribute('y1', bbY);
-            saddleHeightLine.setAttribute('x2', bbX - (saddleHeight * scale) * Math.cos(seatAngleRad));
-            saddleHeightLine.setAttribute('y2', bbY - (saddleHeight * scale) * Math.sin(seatAngleRad));
-            saddleHeightLine.setAttribute('stroke', '#f39c12');
-            saddleHeightLine.setAttribute('stroke-width', '2');
-            saddleHeightLine.setAttribute('stroke-dasharray', '4,4');
-            svg.appendChild(saddleHeightLine);
-
-            // Tip to BB measurement (HORIZONTAL measurement) - THE KEY MEASUREMENT
+            // 7. Draw measurement lines
+            // Tip to BB (horizontal)
             const tipToBBLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             tipToBBLine.setAttribute('x1', bbX);
             tipToBBLine.setAttribute('y1', bbY);
-            tipToBBLine.setAttribute('x2', saddleTipX);
-            tipToBBLine.setAttribute('y2', bbY); // Same Y level as BB (horizontal line)
+            tipToBBLine.setAttribute('x2', params.saddleTipX);
+            tipToBBLine.setAttribute('y2', bbY);
             tipToBBLine.setAttribute('stroke', '#e74c3c');
-            tipToBBLine.setAttribute('stroke-width', '3');
-            tipToBBLine.setAttribute('stroke-dasharray', '6,6');
+            tipToBBLine.setAttribute('stroke-width', '2');
+            tipToBBLine.setAttribute('stroke-dasharray', '4,4');
             svg.appendChild(tipToBBLine);
-
-            // Saddle height label (positioned along seatpost shaft line)
-            const saddleHeightEndX = bbX - (saddleHeight * scale) * Math.cos(seatAngleRad);
-            const saddleHeightEndY = bbY - (saddleHeight * scale) * Math.sin(seatAngleRad);
-            const saddleHeightText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            saddleHeightText.setAttribute('x', (bbX + saddleHeightEndX) / 2 - 40);
-            saddleHeightText.setAttribute('y', (bbY + saddleHeightEndY) / 2);
-            saddleHeightText.setAttribute('class', 'measurement-text');
-            saddleHeightText.setAttribute('font-weight', 'bold');
-            saddleHeightText.textContent = `SADDLE HEIGHT: ${saddleHeight}mm`;
-            svg.appendChild(saddleHeightText);
-
-            // Tip-to-BB measurement label (positioned along horizontal line)
-            const tipToBBText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            tipToBBText.setAttribute('x', (bbX + saddleTipX) / 2);
-            tipToBBText.setAttribute('y', bbY - 15); // Above the horizontal line
-            tipToBBText.setAttribute('class', 'measurement-text');
-            tipToBBText.setAttribute('font-weight', 'bold');
-            tipToBBText.setAttribute('font-size', '12px');
-            tipToBBText.setAttribute('text-anchor', 'middle');
-            tipToBBText.textContent = `TIP-TO-BB: ${saddleTipToBB}mm`;
-            svg.appendChild(tipToBBText);
-
-            // Seatpost setback label
-            const setbackText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            setbackText.setAttribute('x', seatpostHeadX + 10);
-            setbackText.setAttribute('y', seatpostHeadY - 10);
-            setbackText.setAttribute('class', 'measurement-text');
-            setbackText.setAttribute('font-size', '12px');
-            setbackText.textContent = `SETBACK: ${Math.round(seatpostSetback)}mm`;
-            svg.appendChild(setbackText);
-
-            // Saddle-to-bar height measurement (vertical line) - to top of handlebar circle
+            
+            // Saddle to bar top drop (vertical to target)
             const saddleToBarLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            saddleToBarLine.setAttribute('x1', saddleCenterX - 30); // Offset to avoid cluttering
-            saddleToBarLine.setAttribute('y1', saddleCenterY);
-            saddleToBarLine.setAttribute('x2', saddleCenterX - 30);
-            saddleToBarLine.setAttribute('y2', handlebarTopY);
+            saddleToBarLine.setAttribute('x1', params.saddleTipX - 30);
+            saddleToBarLine.setAttribute('y1', params.saddleTipY);
+            saddleToBarLine.setAttribute('x2', params.saddleTipX - 30);
+            saddleToBarLine.setAttribute('y2', params.targetBarTopY);
             saddleToBarLine.setAttribute('stroke', '#9b59b6');
             saddleToBarLine.setAttribute('stroke-width', '2');
             saddleToBarLine.setAttribute('stroke-dasharray', '4,4');
             svg.appendChild(saddleToBarLine);
-
-            // Use actual drop from optimization results
-            const actualDrop = params.actualDrop || ((handlebarTopY - saddleCenterY) / scale);
-            const dropError = params.dropError || Math.abs(actualDrop - saddleToBarHeight);
             
-            // Color code based on error
-            const dropErrorColor = dropError <= 5 ? '#27ae60' : dropError <= 15 ? '#f39c12' : '#e74c3c';
-            
-            // Saddle-to-bar height label
-            const saddleToBarText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            saddleToBarText.setAttribute('x', saddleCenterX - 90);
-            saddleToBarText.setAttribute('y', (saddleCenterY + handlebarTopY) / 2);
-            saddleToBarText.setAttribute('class', 'measurement-text');
-            saddleToBarText.setAttribute('font-weight', 'bold');
-            saddleToBarText.setAttribute('font-size', '12px');
-            saddleToBarText.setAttribute('fill', dropErrorColor);
-            saddleToBarText.setAttribute('transform', `rotate(-90, ${saddleCenterX - 90}, ${(saddleCenterY + handlebarTopY) / 2})`);
-            saddleToBarText.textContent = `ACTUAL DROP: ${Math.round(actualDrop)}mm (target: ${saddleToBarHeight}mm, ±${Math.round(dropError)}mm)`;
-            svg.appendChild(saddleToBarText);
-
-            // Tip-to-bar top measurement (diagonal line) - THE KEY BIKE FIT MEASUREMENT
+            // Tip to bar top (diagonal to target)
             const tipToBarLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            tipToBarLine.setAttribute('x1', saddleTipX);
-            tipToBarLine.setAttribute('y1', saddleTipY);
-            tipToBarLine.setAttribute('x2', handlebarX);
-            tipToBarLine.setAttribute('y2', handlebarTopY);
+            tipToBarLine.setAttribute('x1', params.saddleTipX);
+            tipToBarLine.setAttribute('y1', params.saddleTipY);
+            tipToBarLine.setAttribute('x2', params.targetBarTopX);
+            tipToBarLine.setAttribute('y2', params.targetBarTopY);
             tipToBarLine.setAttribute('stroke', '#27ae60');
-            tipToBarLine.setAttribute('stroke-width', '3');
-            tipToBarLine.setAttribute('stroke-dasharray', '8,8');
+            tipToBarLine.setAttribute('stroke-width', '2');
+            tipToBarLine.setAttribute('stroke-dasharray', '6,6');
             svg.appendChild(tipToBarLine);
-
-            // Use actual tip-to-bar from optimization results
-            const actualTipToBar = params.actualTipToBar || Math.sqrt(
-                Math.pow((handlebarX - saddleTipX) / scale, 2) + 
-                Math.pow((handlebarTopY - saddleTipY) / scale, 2)
-            );
-            const tipToBarError = params.tipToBarError || Math.abs(actualTipToBar - saddleTipToBarCenter);
             
-            // Color code based on error
-            const tipToBarErrorColor = tipToBarError <= 10 ? '#27ae60' : tipToBarError <= 25 ? '#f39c12' : '#e74c3c';
+            // 8. Coordinate labels
+            const labels = [
+                { x: bbX, y: bbY, text: `BB: (${bbX}, ${bbY})px`, color: '#e74c3c' },
+                { x: headTubeTopX, y: headTubeTopY, text: `HEAD: (${Math.round(headTubeTopX)}, ${Math.round(headTubeTopY)})px`, color: '#3498db' },
+                { x: spacerTopX, y: spacerTopY, text: `SPACER: (${Math.round(spacerTopX)}, ${Math.round(spacerTopY)})px`, color: '#f39c12' },
+                { x: stemBodyTopX, y: stemBodyTopY, text: `STEM BODY: (${Math.round(stemBodyTopX)}, ${Math.round(stemBodyTopY)})px`, color: '#2c3e50' },
+                { x: params.saddleTipX, y: params.saddleTipY, text: `TIP: (${Math.round(params.saddleTipX)}, ${Math.round(params.saddleTipY)})px`, color: '#8e44ad' },
+                { x: params.targetBarTopX, y: params.targetBarTopY, text: `TARGET: (${Math.round(params.targetBarTopX)}, ${Math.round(params.targetBarTopY)})px`, color: '#27ae60' },
+                { x: stemEndX, y: stemEndY, text: `ACTUAL: (${Math.round(stemEndX)}, ${Math.round(stemEndY)})px`, color: '#16a085' }
+            ];
             
-            // Tip-to-bar top label
-            const tipToBarText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            tipToBarText.setAttribute('x', (saddleTipX + handlebarX) / 2);
-            tipToBarText.setAttribute('y', (saddleTipY + handlebarTopY) / 2 - 10);
-            tipToBarText.setAttribute('class', 'measurement-text');
-            tipToBarText.setAttribute('font-weight', 'bold');
-            tipToBarText.setAttribute('font-size', '12px');
-            tipToBarText.setAttribute('text-anchor', 'middle');
-            tipToBarText.setAttribute('fill', tipToBarErrorColor);
-            tipToBarText.textContent = `ACTUAL: ${Math.round(actualTipToBar)}mm (target: ${saddleTipToBarCenter}mm, ±${Math.round(tipToBarError)}mm)`;
-            svg.appendChild(tipToBarText);
+            labels.forEach(label => {
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', label.x + 10);
+                text.setAttribute('y', label.y - 10);
+                text.setAttribute('class', 'measurement-text');
+                text.setAttribute('font-size', '10px');
+                text.setAttribute('fill', label.color);
+                text.textContent = label.text;
+                svg.appendChild(text);
+            });
             
-            // Add overall fit quality indicator
-            if (params.dropError !== undefined && params.tipToBarError !== undefined) {
-                const overallError = Math.max(dropError, tipToBarError);
-                let fitQuality, fitColor, fitSymbol;
-                
-                if (overallError <= 5) {
-                    fitQuality = 'EXCELLENT FIT';
-                    fitColor = '#27ae60';
-                    fitSymbol = '🎯';
-                } else if (overallError <= 15) {
-                    fitQuality = 'GOOD FIT';
-                    fitColor = '#f39c12';
-                    fitSymbol = '✅';
-                } else {
-                    fitQuality = 'ACCEPTABLE FIT';
-                    fitColor = '#e74c3c';
-                    fitSymbol = '⚠️';
-                }
-                
-                const fitIndicator = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                fitIndicator.setAttribute('x', bbX + 50);
-                fitIndicator.setAttribute('y', bbY - 30);
-                fitIndicator.setAttribute('class', 'measurement-text');
-                fitIndicator.setAttribute('font-weight', 'bold');
-                fitIndicator.setAttribute('font-size', '16px');
-                fitIndicator.setAttribute('fill', fitColor);
-                fitIndicator.textContent = `${fitSymbol} ${fitQuality}`;
-                svg.appendChild(fitIndicator);
-            }
+            // 9. Stem angle debug info
+            const stemAngleDebugText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            stemAngleDebugText.setAttribute('x', 50);
+            stemAngleDebugText.setAttribute('y', 50);
+            stemAngleDebugText.setAttribute('class', 'measurement-text');
+            stemAngleDebugText.setAttribute('font-size', '11px');
+            stemAngleDebugText.setAttribute('fill', '#2c3e50');
+            stemAngleDebugText.textContent = `STEM: ${params.stemAngle}° (${params.stemAngle < 0 ? 'DOWN' : 'UP'})`;
+            svg.appendChild(stemAngleDebugText);
+            
+            // Direction check: Are handlebars below spacer top?
+            const directionCheck = stemEndY > spacerTopY ? 'DOWN ✓' : 'UP ✗';
+            const directionText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            directionText.setAttribute('x', 50);
+            directionText.setAttribute('y', 70);
+            directionText.setAttribute('class', 'measurement-text');
+            directionText.setAttribute('font-size', '11px');
+            directionText.setAttribute('fill', stemEndY > spacerTopY ? '#27ae60' : '#e74c3c');
+            directionText.textContent = `DIRECTION: ${directionCheck}`;
+            svg.appendChild(directionText);
         }
+        
+        window.loadStrael54T = function() {
 
-
-
-
-
-        // Load test data for 54T Strael
-        function loadStrael54T() {
+            
             // Frame geometry
             document.getElementById('reach').value = 378;
             document.getElementById('stack').value = 580;
@@ -1282,34 +425,34 @@
             document.getElementById('seatAngle').value = 73.75;
             document.getElementById('headTube').value = 157;
 
-            // Bike fit (optimal values)
+            // Bike fit (optimal values)  
             document.getElementById('saddleHeight').value = 760;
             document.getElementById('saddleTipToBB').value = 91;
             document.getElementById('saddleToBarHeight').value = 64;
             document.getElementById('saddleTipToBarCenter').value = 550;
 
-            // Calculate and show test results
+            // Component configuration (based on bike fitter recommendation: ~90mm stem)
+            document.getElementById('spacerHeight').value = 20;
+            document.getElementById('stemLength').value = 90;
+            document.getElementById('stemAngle').value = -6;
+
+            // Calculate and draw
             calculateBikeFit();
             
-            const stemResult = parseFloat(document.getElementById('stemLength').textContent);
-            const seatpostResult = parseFloat(document.getElementById('seatpostSetback').textContent);
-            
-            let testMessage = `Test Results:<br>`;
-            testMessage += `Stem: ${Math.round(stemResult)}mm (Target: ~90mm) `;
-            testMessage += Math.abs(stemResult - 90) < 15 ? '<span class="success">✅</span>' : '<span class="warning">❌</span>';
-            testMessage += `<br>Seatpost: ${seatpostResult.toFixed(1)}mm (Target: ~25mm) `;
-            testMessage += Math.abs(seatpostResult - 25) < 10 ? '<span class="success">✅</span>' : '<span class="warning">❌</span>';
-            
-            document.getElementById('testResults').innerHTML = testMessage;
-        }
-
-        // Add event listeners to all inputs
+            document.getElementById('testResults').innerHTML = '✅ Test data loaded!';
+        };
+        
+        // Auto-calculate on input changes
         document.addEventListener('DOMContentLoaded', function() {
             const inputs = document.querySelectorAll('input[type="number"]');
             inputs.forEach(input => {
                 input.addEventListener('input', calculateBikeFit);
             });
         });
+        
+        // Test that script is loading
+        console.log('🔧 Script loaded successfully!');
+        console.log('🔧 loadStrael54T function defined:', typeof window.loadStrael54T);
     </script>
 </body>
 </html>
