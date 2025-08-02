@@ -259,7 +259,7 @@
                     </div>
                     <div class="form-row">
                         <label for="saddleToBarHeight">Saddle to Bar Height Diff:</label>
-                        <input type="number" id="saddleToBarHeight" step="0.1" placeholder="-64">
+                        <input type="number" id="saddleToBarHeight" step="0.1" placeholder="64">
                     </div>
                     <div class="form-row">
                         <label for="saddleTipToBarCenter">Tip of Saddle to Bar Center:</label>
@@ -354,6 +354,7 @@
             const saddleLength = parseFloat(document.getElementById('saddleLength').value) || 250;
             const saddleTipToBB = parseFloat(document.getElementById('saddleTipToBB').value) || 91;
             const saddleRailPosition = parseFloat(document.getElementById('saddleRailPosition').value) || 0;
+            const saddleToBarHeight = parseFloat(document.getElementById('saddleToBarHeight').value) || 64;
             
             // === SEATPOST SETBACK CALCULATION ===
             // Calculate required seatpost setback to achieve target tip-to-BB distance
@@ -391,7 +392,7 @@
             // Draw the bike frame with actual geometry and fit data
             drawBikeDiagram({
                 reach, stack, headAngle, seatAngle, headTube, seatTube, bbDrop,
-                saddleHeight, saddleLength, seatpostSetback, saddleTipToBB, saddleRailPosition
+                saddleHeight, saddleLength, seatpostSetback, saddleTipToBB, saddleRailPosition, saddleToBarHeight
             });
         }
 
@@ -436,7 +437,7 @@
 
         function updateShoppingList(results) {
             const shoppingList = `
-                <strong>🎯 Step 5: Seatpost Setback Calculation!</strong><br><br>
+                <strong>🎯 Step 6: Handlebars Added!</strong><br><br>
                 📏 <strong>Reach:</strong> ${document.getElementById('reach').value}mm<br>
                 📐 <strong>Stack:</strong> ${document.getElementById('stack').value}mm<br>
                 🪑 <strong>Seat Angle:</strong> ${document.getElementById('seatAngle').value}°<br>
@@ -445,7 +446,8 @@
                 📏 <strong>Head Tube:</strong> ${document.getElementById('headTube').value}mm<br>
                 🏍️ <strong>Saddle Height:</strong> ${document.getElementById('saddleHeight').value}mm<br>
                 📏 <strong>Saddle Length:</strong> ${document.getElementById('saddleLength').value}mm<br>
-                🎯 <strong>Target Tip-to-BB:</strong> ${document.getElementById('saddleTipToBB').value}mm<br><br>
+                🎯 <strong>Target Tip-to-BB:</strong> ${document.getElementById('saddleTipToBB').value}mm<br>
+                📐 <strong>Saddle-Bar Drop:</strong> ${document.getElementById('saddleToBarHeight').value}mm<br><br>
                 <strong>✅ What you should see:</strong><br>
                 • Red BB center point<br>
                 • Blue head tube top point<br>
@@ -453,10 +455,12 @@
                 • Dark gray frame triangle<br>
                 • Dark seatpost (shaft + setback head)<br>
                 • Purple saddle with red tip marker<br>
+                • Teal handlebar circle (positioned by height diff)<br>
                 • Orange saddle height (straight up seatpost)<br>
                 • Red tip-to-BB (horizontal measurement)<br>
+                • Purple saddle-to-bar height measurement<br>
                 • Calculated setback label<br><br>
-                <em>Seatpost setback optimized for fit! 🎯</em>
+                <em>Handlebars positioned by fit data! 🚴‍♂️</em>
             `;
             document.getElementById('shoppingList').innerHTML = shoppingList;
         }
@@ -500,7 +504,7 @@
             const headTubeBottomX = headTubeTopX + (headTube * scale) * Math.cos(headAngleRad);
             const headTubeBottomY = headTubeTopY + (headTube * scale) * Math.sin(headAngleRad);
 
-            // === STEP 5: BB, STACK, REACH + SEAT TUBE + HEAD TUBE + TOP TUBE + SEATPOST + SADDLE ===
+            // === STEP 6: BB, STACK, REACH + SEAT TUBE + HEAD TUBE + TOP TUBE + SEATPOST + SADDLE + HANDLEBARS ===
             
             // 1. Draw Bottom Bracket (origin point)
             const bbCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -704,6 +708,7 @@
             const seatpostSetback = params.seatpostSetback || 25;
             const saddleTipToBB = params.saddleTipToBB || 91;
             const saddleRailPosition = params.saddleRailPosition || 0;
+            const saddleToBarHeight = params.saddleToBarHeight || 64;
             
             // Calculate seatpost length: saddleHeight - seatTube
             const seatpostLength = saddleHeight - seatTube;
@@ -772,6 +777,24 @@
             saddleTipCircle.setAttribute('fill', '#e74c3c');
             svg.appendChild(saddleTipCircle);
 
+            // === HANDLEBARS ===
+            
+            // Calculate handlebar position
+            // X: Same as head tube top (for now)
+            // Y: Saddle center Y + saddle-to-bar height difference
+            const handlebarX = headTubeTopX;
+            const handlebarY = saddleCenterY + (saddleToBarHeight * scale); // Positive value means bars lower than saddle
+            
+            // 10. Draw HANDLEBARS (circle - side view)
+            const handlebarCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            handlebarCircle.setAttribute('cx', handlebarX);
+            handlebarCircle.setAttribute('cy', handlebarY);
+            handlebarCircle.setAttribute('r', 8);
+            handlebarCircle.setAttribute('fill', '#16a085');
+            handlebarCircle.setAttribute('stroke', '#138d75');
+            handlebarCircle.setAttribute('stroke-width', '2');
+            svg.appendChild(handlebarCircle);
+
             // Saddle height measurement (BB to saddle level, straight up seatpost shaft)
             const saddleHeightLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             saddleHeightLine.setAttribute('x1', bbX);
@@ -824,6 +847,28 @@
             setbackText.setAttribute('font-size', '12px');
             setbackText.textContent = `SETBACK: ${Math.round(seatpostSetback)}mm`;
             svg.appendChild(setbackText);
+
+            // Saddle-to-bar height measurement (vertical line)
+            const saddleToBarLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            saddleToBarLine.setAttribute('x1', saddleCenterX - 30); // Offset to avoid cluttering
+            saddleToBarLine.setAttribute('y1', saddleCenterY);
+            saddleToBarLine.setAttribute('x2', saddleCenterX - 30);
+            saddleToBarLine.setAttribute('y2', handlebarY);
+            saddleToBarLine.setAttribute('stroke', '#9b59b6');
+            saddleToBarLine.setAttribute('stroke-width', '2');
+            saddleToBarLine.setAttribute('stroke-dasharray', '4,4');
+            svg.appendChild(saddleToBarLine);
+
+            // Saddle-to-bar height label
+            const saddleToBarText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            saddleToBarText.setAttribute('x', saddleCenterX - 90);
+            saddleToBarText.setAttribute('y', (saddleCenterY + handlebarY) / 2);
+            saddleToBarText.setAttribute('class', 'measurement-text');
+            saddleToBarText.setAttribute('font-weight', 'bold');
+            saddleToBarText.setAttribute('font-size', '12px');
+            saddleToBarText.setAttribute('transform', `rotate(-90, ${saddleCenterX - 90}, ${(saddleCenterY + handlebarY) / 2})`);
+            saddleToBarText.textContent = `SADDLE DROP: ${saddleToBarHeight}mm`;
+            svg.appendChild(saddleToBarText);
         }
 
 
@@ -843,7 +888,7 @@
             // Bike fit (optimal values)
             document.getElementById('saddleHeight').value = 760;
             document.getElementById('saddleTipToBB').value = 91;
-            document.getElementById('saddleToBarHeight').value = -64;
+            document.getElementById('saddleToBarHeight').value = 64;
             document.getElementById('saddleTipToBarCenter').value = 550;
 
             // Calculate and show test results
