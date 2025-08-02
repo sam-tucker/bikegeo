@@ -423,13 +423,14 @@
 
         function updateShoppingList(results) {
             const shoppingList = `
-                <strong>🎯 Step 3: Head Tube Added</strong><br><br>
+                <strong>🎯 Step 4: Frame Triangle Complete!</strong><br><br>
                 📏 <strong>Reach:</strong> ${document.getElementById('reach').value}mm<br>
                 📐 <strong>Stack:</strong> ${document.getElementById('stack').value}mm<br>
                 🪑 <strong>Seat Angle:</strong> ${document.getElementById('seatAngle').value}°<br>
                 📏 <strong>Seat Tube C-T:</strong> ${document.getElementById('seatTube').value}mm<br>
                 🔧 <strong>Head Angle:</strong> ${document.getElementById('headAngle').value}°<br>
-                📏 <strong>Head Tube:</strong> ${document.getElementById('headTube').value}mm<br><br>
+                📏 <strong>Head Tube:</strong> ${document.getElementById('headTube').value}mm<br>
+                📏 <strong>Top Tube:</strong> ${document.getElementById('topTube').value}mm<br><br>
                 <strong>✅ What you should see:</strong><br>
                 • Red BB center point<br>
                 • Blue head tube top point<br>
@@ -438,8 +439,10 @@
                 • Dark gray seat tube (from BB)<br>
                 • Orange seat tube measurement<br>
                 • Dark gray head tube (angled)<br>
-                • Purple head tube measurement<br><br>
-                <em>Now we have both main frame tubes!</em>
+                • Purple head tube measurement<br>
+                • Dark gray top tube (connecting the triangle)<br>
+                • Green top tube measurement<br><br>
+                <em>Complete main frame triangle! 🎉</em>
             `;
             document.getElementById('shoppingList').innerHTML = shoppingList;
         }
@@ -464,6 +467,7 @@
             const seatTube = params.seatTube || 536;
             const headAngle = params.headAngle || 72.25;
             const headTube = params.headTube || 157;
+            const topTube = params.topTube || 548;
 
             // Head tube top position (scaled) - still needed for measurements
             const headTubeTopX = bbX + (reach * scale);
@@ -482,7 +486,7 @@
             const headTubeBottomX = headTubeTopX + (headTube * scale) * Math.cos(headAngleRad);
             const headTubeBottomY = headTubeTopY + (headTube * scale) * Math.sin(headAngleRad);
 
-            // === STEP 3: BB, STACK, REACH + SEAT TUBE + HEAD TUBE ===
+            // === STEP 4: BB, STACK, REACH + SEAT TUBE + HEAD TUBE + TOP TUBE ===
             
             // 1. Draw Bottom Bracket (origin point)
             const bbCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -645,6 +649,38 @@
             headAngleText.setAttribute('font-size', '12px');
             headAngleText.textContent = `HEAD ANGLE: ${headAngle}°`;
             svg.appendChild(headAngleText);
+
+            // 7. Draw TOP TUBE (effective) - connects seat tube top to head tube top
+            const topTubeElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            topTubeElement.setAttribute('x1', seatTubeTopX);
+            topTubeElement.setAttribute('y1', seatTubeTopY);
+            topTubeElement.setAttribute('x2', headTubeTopX);
+            topTubeElement.setAttribute('y2', headTubeTopY);
+            topTubeElement.setAttribute('stroke', '#34495e');
+            topTubeElement.setAttribute('stroke-width', '6');
+            topTubeElement.setAttribute('stroke-linecap', 'round');
+            svg.appendChild(topTubeElement);
+
+            // Top tube measurement line
+            const topTubeMeasurementLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            topTubeMeasurementLine.setAttribute('x1', seatTubeTopX);
+            topTubeMeasurementLine.setAttribute('y1', seatTubeTopY);
+            topTubeMeasurementLine.setAttribute('x2', headTubeTopX);
+            topTubeMeasurementLine.setAttribute('y2', headTubeTopY);
+            topTubeMeasurementLine.setAttribute('stroke', '#27ae60');
+            topTubeMeasurementLine.setAttribute('stroke-width', '2');
+            topTubeMeasurementLine.setAttribute('stroke-dasharray', '3,3');
+            svg.appendChild(topTubeMeasurementLine);
+
+            // Top tube length label
+            const topTubeText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            topTubeText.setAttribute('x', (seatTubeTopX + headTubeTopX) / 2);
+            topTubeText.setAttribute('y', (seatTubeTopY + headTubeTopY) / 2 - 10);
+            topTubeText.setAttribute('class', 'measurement-text');
+            topTubeText.setAttribute('font-weight', 'bold');
+            topTubeText.setAttribute('text-anchor', 'middle');
+            topTubeText.textContent = `TOP TUBE: ${topTube}mm`;
+            svg.appendChild(topTubeText);
 
             // 6. Add labels for the points
             const bbLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
