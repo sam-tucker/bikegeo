@@ -393,7 +393,7 @@
             // Draw the bike frame with actual geometry and fit data
             drawBikeDiagram({
                 reach, stack, headAngle, seatAngle, headTube, seatTube, bbDrop,
-                saddleHeight, saddleLength, seatpostSetback, saddleTipToBB, saddleRailPosition, saddleToBarHeight, saddleTipToBarCenter
+                saddleHeight, saddleLength, seatpostSetback, saddleTipToBB, saddleRailPosition, saddleToBarHeight, saddleTipToBarCenter, spacerHeight
             });
         }
 
@@ -438,7 +438,7 @@
 
         function updateShoppingList(results) {
             const shoppingList = `
-                <strong>🎯 Step 6: Handlebars Positioned by Fit!</strong><br><br>
+                <strong>🎯 Step 7: Spacers Added!</strong><br><br>
                 📏 <strong>Reach:</strong> ${document.getElementById('reach').value}mm<br>
                 📐 <strong>Stack:</strong> ${document.getElementById('stack').value}mm<br>
                 🪑 <strong>Seat Angle:</strong> ${document.getElementById('seatAngle').value}°<br>
@@ -458,12 +458,14 @@
                 • Dark seatpost (shaft + setback head)<br>
                 • Purple saddle with red tip marker<br>
                 • Teal handlebar circle (positioned by trigonometry)<br>
+                • Orange spacers (extending from head tube top)<br>
                 • Orange saddle height (straight up seatpost)<br>
                 • Red tip-to-BB (horizontal measurement)<br>
                 • Purple saddle drop measurement<br>
                 • Green tip-to-bar diagonal measurement<br>
-                • Calculated setback label<br><br>
-                <em>Handlebars positioned by bike fit trigonometry! 🚴‍♂️</em>
+                • Calculated setback label<br>
+                • Spacer distance label<br><br>
+                <em>Spacers added along head tube angle! 🚴‍♂️</em>
             `;
             document.getElementById('shoppingList').innerHTML = shoppingList;
         }
@@ -702,6 +704,43 @@
             headLabel.setAttribute('font-size', '12px');
             headLabel.textContent = 'HEAD TUBE TOP';
             svg.appendChild(headLabel);
+
+            // === SPACERS ===
+            
+            // Get spacer parameters
+            const spacerDistance = params.spacerHeight || 20; // mm
+            
+            // Calculate spacer top position (extending from head tube top along head tube angle)
+            const spacerTopX = headTubeTopX - (spacerDistance * scale) * Math.cos(headAngleRad);
+            const spacerTopY = headTubeTopY - (spacerDistance * scale) * Math.sin(headAngleRad);
+            
+            // Draw SPACERS (line extending from head tube top)
+            const spacerElement = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            spacerElement.setAttribute('x1', headTubeTopX);
+            spacerElement.setAttribute('y1', headTubeTopY);
+            spacerElement.setAttribute('x2', spacerTopX);
+            spacerElement.setAttribute('y2', spacerTopY);
+            spacerElement.setAttribute('stroke', '#f39c12');
+            spacerElement.setAttribute('stroke-width', '5');
+            spacerElement.setAttribute('stroke-linecap', 'round');
+            svg.appendChild(spacerElement);
+            
+            // Mark spacer top
+            const spacerTopCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            spacerTopCircle.setAttribute('cx', spacerTopX);
+            spacerTopCircle.setAttribute('cy', spacerTopY);
+            spacerTopCircle.setAttribute('r', 3);
+            spacerTopCircle.setAttribute('fill', '#f39c12');
+            svg.appendChild(spacerTopCircle);
+            
+            // Spacer distance label
+            const spacerText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            spacerText.setAttribute('x', (headTubeTopX + spacerTopX) / 2 + 15);
+            spacerText.setAttribute('y', (headTubeTopY + spacerTopY) / 2);
+            spacerText.setAttribute('class', 'measurement-text');
+            spacerText.setAttribute('font-size', '12px');
+            spacerText.textContent = `SPACERS: ${spacerDistance}mm`;
+            svg.appendChild(spacerText);
 
             // === BIKE FIT COMPONENTS ===
             
